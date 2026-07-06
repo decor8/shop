@@ -1,0 +1,570 @@
+/* ===========================================================
+   Ful ko Paila — shop config
+   Edit the values in this block. Nothing else needs to change
+   for day-to-day running of the shop.
+=========================================================== */
+const CONFIG = {
+  // Publish your Google Sheet: File > Share > Publish to web >
+  // choose the product sheet/tab > CSV > Publish, then paste the
+  // link it gives you here.
+  SHEET_CSV_URL: "https://docs.google.com/spreadsheets/d/1TKVFZXRoAT2CzLqTNZsIfo7W4pIc4y1hAWZWXWHxDLc/edit?gid=0#gid=0",
+
+  // WhatsApp number in international format, digits only, no + or spaces.
+  // Example: Nepal number 98XXXXXXXX with country code 977 -> "97798XXXXXXXX"
+  WHATSAPP_NUMBER: "9779860588764",
+
+  // Instagram handle, without the @
+  INSTAGRAM_HANDLE: "FulKoPaila",
+
+  CURRENCY_PREFIX: "Rs. ",
+
+  SHOP_NAME: "Ful ko Paila",
+  SHOP_NAME_NP: "फुलको पाइला",
+
+  // Minimum quantity a customer can pick in the customizer
+  MIN_CUSTOM_QTY: 1,
+  MAX_CUSTOM_QTY: 20,
+};
+
+/* ===========================================================
+   Small bilingual dictionary for UI chrome that's built by JS
+   (product data itself is shown exactly as typed in the sheet —
+   type Nepali directly into Name/Variant/Description if you want
+   a product to read in Nepali).
+=========================================================== */
+const STRINGS = {
+  all: { en: "All", np: "सबै" },
+  qty: { en: "Qty", np: "परिमाण" },
+  orderWhatsapp: { en: "Order on WhatsApp", np: "WhatsApp मा अर्डर गर्नुहोस्" },
+  soldOut: { en: "Sold out", np: "बिक्री सकियो" },
+  igCopied: {
+    en: "Order details copied — paste them into the DM that just opened.",
+    np: "अर्डर विवरण कपी भयो — भर्खरै खुलेको DM मा पेस्ट गर्नुहोस्।",
+  },
+  igFallback: {
+    en: (h) => `Message your order to @${h} on Instagram.`,
+    np: (h) => `आफ्नो अर्डर Instagram मा @${h} लाई म्यासेज गर्नुहोस्।`,
+  },
+  each: { en: "each", np: "प्रत्येक" },
+  noExtra: { en: "No extra", np: "थप केही छैन" },
+};
+
+function currentLang() {
+  return document.body.classList.contains("lang-np") ? "np" : "en";
+}
+function t(key, ...args) {
+  const entry = STRINGS[key];
+  if (!entry) return "";
+  const val = entry[currentLang()];
+  return typeof val === "function" ? val(...args) : val;
+}
+
+/* ===========================================================
+   CSV parsing — handles quoted fields and commas inside quotes,
+   since Google Sheets exports can include either.
+=========================================================== */
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; }
+        else { inQuotes = false; }
+      } else {
+        field += c;
+      }
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ",") { row.push(field); field = ""; }
+      else if (c === "\n") { row.push(field); rows.push(row); row = []; field = ""; }
+      else if (c === "\r") { /* skip */ }
+      else field += c;
+    }
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows.filter(r => r.some(cell => cell.trim() !== ""));
+}
+
+function rowsToProducts(rows) {
+  if (!rows.length) return [];
+  const headers = rows[0].map(h => h.trim().toLowerCase());
+  const idx = (name) => headers.indexOf(name);
+
+  const iName = idx("name");
+  const iCategory = idx("category");
+  const iVariant = idx("variant");
+  const iPrice = idx("price");
+  const iImage = idx("image url");
+  const iStock = idx("in stock");
+  const iDesc = idx("description");
+  const iRole = idx("customizer role");
+
+  return rows.slice(1).map((r, i) => {
+    const stockRaw = (iStock > -1 ? r[iStock] : "yes").trim().toLowerCase();
+    const inStock = !["no", "false", "0", "sold out"].includes(stockRaw);
+    const priceNum = parseFloat((iPrice > -1 ? r[iPrice] : "0").replace(/[^\d.]/g, "")) || 0;
+    const roleRaw = (iRole > -1 ? r[iRole] : "").trim().toLowerCase();
+
+    return {
+      id: `p${i}`,
+      name: (iName > -1 ? r[iName] : "Untitled").trim(),
+      category: (iCategory > -1 ? r[iCategory] : "Other").trim(),
+      variant: (iVariant > -1 ? r[iVariant] : "").trim(),
+      price: priceNum,
+      image: (iImage > -1 ? r[iImage] : "").trim(),
+      inStock,
+      description: (iDesc > -1 ? r[iDesc] : "").trim(),
+      customizerRole: roleRaw, // "flower" | "addon" | "wrap" | ""
+    };
+  }).filter(p => p.name && p.name !== "Untitled");
+}
+
+/* ===========================================================
+   Category accent colors — cycled by name, so any new category
+   you add later automatically gets a consistent color for its
+   badge, card accent bar, and filter dot.
+=========================================================== */
+const ACCENTS = [
+  { strong: "#E39A34", soft: "#F6E4C4", shadow: "rgba(227,154,52,0.35)" },  // marigold
+  { strong: "#8C3A51", soft: "#F0DCE1", shadow: "rgba(140,58,81,0.30)" },   // thread
+  { strong: "#3E5B44", soft: "#DCE6DC", shadow: "rgba(62,91,68,0.28)" },    // moss
+  { strong: "#B5502E", soft: "#F1DED2", shadow: "rgba(181,80,46,0.30)" },   // clay
+  { strong: "#4A4E7C", soft: "#DEDFEC", shadow: "rgba(74,78,124,0.28)" },   // plum
+];
+
+function accentFor(category) {
+  const str = (category || "").toLowerCase();
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
+  return ACCENTS[hash % ACCENTS.length];
+}
+
+/* ===========================================================
+   Rendering — main shelf
+=========================================================== */
+const shelfEl = document.getElementById("shelf");
+const filtersEl = document.getElementById("filters");
+const emptyStateEl = document.getElementById("empty-state");
+const loadErrorEl = document.getElementById("load-error");
+const toastEl = document.getElementById("toast");
+
+let allProducts = [];
+let activeCategory = "All";
+
+function renderSkeleton(count = 6) {
+  shelfEl.innerHTML = Array.from({ length: count }).map(() => `
+    <div class="skeleton-card">
+      <div class="skeleton-media"></div>
+      <div class="skeleton-lines">
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function placeholderIcon(category) {
+  const cat = (category || "").toLowerCase();
+  if (/candle/.test(cat)) {
+    return `<svg class="placeholder-icon" viewBox="0 0 48 48"><path d="M18 20h12v20a2 2 0 0 1-2 2H20a2 2 0 0 1-2-2V20Z"/><path d="M22 20c0-6 2-8 2-12 0 4 2 6 2 12"/></svg>`;
+  }
+  if (/flower|wire|bloom/.test(cat)) {
+    return `<svg class="placeholder-icon" viewBox="0 0 48 48"><circle cx="24" cy="16" r="7"/><circle cx="14" cy="26" r="6"/><circle cx="34" cy="26" r="6"/><path d="M24 23v19"/></svg>`;
+  }
+  return `<svg class="placeholder-icon" viewBox="0 0 48 48"><rect x="10" y="18" width="28" height="20" rx="2"/><path d="M10 25h28"/><path d="M24 18v20"/><path d="M18 18c0-4.5 2.7-8 6-8s6 3.5 6 8"/></svg>`;
+}
+
+function money(n) {
+  return `${CONFIG.CURRENCY_PREFIX}${n.toLocaleString()}`;
+}
+
+function buildOrderMessage(product, qty) {
+  if (currentLang() === "np") {
+    return [
+      `नमस्ते ${CONFIG.SHOP_NAME_NP}! 🌸`,
+      `मलाई यो अर्डर गर्नु छ:`,
+      `• ${product.name}${product.variant ? " (" + product.variant + ")" : ""} × ${qty} — ${money(product.price * qty)}`,
+      ``,
+      `कृपया अर्को चरण बताइदिनुहोस्। धन्यवाद!`,
+    ].join("\n");
+  }
+  return [
+    `Hi ${CONFIG.SHOP_NAME}! 🌸`,
+    `I'd like to order:`,
+    `• ${product.name}${product.variant ? " (" + product.variant + ")" : ""} × ${qty} — ${money(product.price * qty)}`,
+    ``,
+    `Could you let me know the next steps? Thank you!`,
+  ].join("\n");
+}
+
+function showToast(message) {
+  toastEl.textContent = message;
+  toastEl.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toastEl.classList.remove("show"), 3200);
+}
+
+function renderFilters() {
+  const categories = ["All", ...new Set(allProducts.map(p => p.category).filter(Boolean))];
+  filtersEl.innerHTML = "";
+  categories.forEach(cat => {
+    const btn = document.createElement("button");
+    btn.className = "filter-btn" + (cat === activeCategory ? " active" : "");
+    btn.setAttribute("aria-pressed", cat === activeCategory ? "true" : "false");
+
+    if (cat === "All") {
+      btn.innerHTML = `<span class="en">All</span><span class="np">सबै</span>`;
+    } else {
+      const accent = accentFor(cat);
+      btn.innerHTML = `<span class="dot" style="background:${accent.strong}"></span>${cat}`;
+    }
+
+    btn.addEventListener("click", () => {
+      if (cat === activeCategory) return;
+      activeCategory = cat;
+      renderFilters();
+      shelfEl.classList.add("is-switching");
+      setTimeout(() => {
+        renderShelf();
+        shelfEl.classList.remove("is-switching");
+      }, 120);
+    });
+    filtersEl.appendChild(btn);
+  });
+}
+
+function renderShelf() {
+  const visible = allProducts.filter(p => activeCategory === "All" || p.category === activeCategory);
+  shelfEl.innerHTML = "";
+
+  emptyStateEl.hidden = visible.length > 0;
+  if (!visible.length) return;
+
+  visible.forEach((product, i) => {
+    const card = document.createElement("article");
+    card.className = "card" + (product.inStock ? "" : " sold-out");
+    card.style.animationDelay = `${Math.min(i, 8) * 45}ms`;
+
+    const accent = accentFor(product.category);
+    card.style.setProperty("--accent", accent.strong);
+    card.style.setProperty("--accent-soft", accent.soft);
+    card.style.setProperty("--accent-shadow", accent.shadow);
+
+    card.innerHTML = `
+      <div class="card-media">
+        ${product.image
+          ? `<img src="${product.image}" alt="${product.name}" loading="lazy">`
+          : placeholderIcon(product.category)}
+        <div class="sold-out-badge"><span class="en">Sold out</span><span class="np">बिक्री सकियो</span></div>
+      </div>
+      <div class="price-tag">${money(product.price)}</div>
+      <div class="card-body">
+        ${product.category ? `<span class="category-badge">${product.category}</span>` : ""}
+        <h3 class="card-name">${product.name}</h3>
+        ${product.variant ? `<p class="card-variant">${product.variant}</p>` : ""}
+        ${product.description ? `<p class="card-variant">${product.description}</p>` : ""}
+
+        <div class="qty-row">
+          <span><span class="en">Qty</span><span class="np">परिमाण</span></span>
+          <div class="stepper">
+            <button type="button" data-action="dec" aria-label="Decrease quantity">–</button>
+            <output>1</output>
+            <button type="button" data-action="inc" aria-label="Increase quantity">+</button>
+          </div>
+        </div>
+
+        <div class="order-actions">
+          <button type="button" class="order-btn whatsapp" data-channel="whatsapp" ${product.inStock ? "" : "disabled"}>
+            ${product.inStock
+              ? `<span class="en">Order on WhatsApp</span><span class="np">WhatsApp मा अर्डर</span>`
+              : `<span class="en">Sold out</span><span class="np">बिक्री सकियो</span>`}
+          </button>
+          ${product.inStock ? `
+          <button type="button" class="order-btn instagram" data-channel="instagram">
+            DM
+          </button>` : ""}
+        </div>
+      </div>
+    `;
+
+    const output = card.querySelector("output");
+    card.querySelector('[data-action="dec"]').addEventListener("click", () => {
+      output.textContent = Math.max(1, parseInt(output.textContent, 10) - 1);
+    });
+    card.querySelector('[data-action="inc"]').addEventListener("click", () => {
+      output.textContent = Math.min(20, parseInt(output.textContent, 10) + 1);
+    });
+
+    const waBtn = card.querySelector('[data-channel="whatsapp"]');
+    if (waBtn) {
+      waBtn.addEventListener("click", () => {
+        const qty = parseInt(output.textContent, 10);
+        const msg = buildOrderMessage(product, qty);
+        window.open(`https://wa.me/${CONFIG.WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
+      });
+    }
+
+    const igBtn = card.querySelector('[data-channel="instagram"]');
+    if (igBtn) {
+      igBtn.addEventListener("click", async () => {
+        const qty = parseInt(output.textContent, 10);
+        const msg = buildOrderMessage(product, qty);
+        try {
+          await navigator.clipboard.writeText(msg);
+          showToast(t("igCopied"));
+        } catch {
+          showToast(t("igFallback", CONFIG.INSTAGRAM_HANDLE));
+        }
+        window.open(`https://ig.me/m/${CONFIG.INSTAGRAM_HANDLE}`, "_blank", "noopener");
+      });
+    }
+
+    shelfEl.appendChild(card);
+  });
+}
+
+function wireFooterLinks() {
+  const waLink = `https://wa.me/${CONFIG.WHATSAPP_NUMBER}`;
+  document.getElementById("footer-whatsapp").href = waLink;
+  document.getElementById("empty-whatsapp-link").href = waLink;
+  document.getElementById("footer-instagram").href = `https://instagram.com/${CONFIG.INSTAGRAM_HANDLE}`;
+  const topbarWa = document.getElementById("topbar-whatsapp");
+  if (topbarWa) topbarWa.href = waLink;
+}
+
+/* ===========================================================
+   Language toggle
+=========================================================== */
+function wireLangToggle() {
+  const btn = document.getElementById("langToggle");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    const goingToNepali = document.body.classList.contains("lang-en");
+    document.body.classList.toggle("lang-en", !goingToNepali);
+    document.body.classList.toggle("lang-np", goingToNepali);
+    btn.textContent = goingToNepali ? "EN" : "ने";
+    // Re-render dynamic bits so any JS-generated text picks up the new language
+    renderFilters();
+    renderShelf();
+    updateCustomizerSummary();
+  });
+}
+
+/* ===========================================================
+   Build-your-own customizer — entirely data-driven from the
+   same sheet. Tag rows in the "Customizer Role" column:
+     Flower -> base item, priced per piece
+     Addon  -> optional extra (e.g. a candle)
+     Wrap   -> required wrapping/packaging choice
+   If no rows are tagged "Flower", the whole section hides.
+=========================================================== */
+const customizerSection = document.getElementById("customizer");
+const flowerGridEl = document.getElementById("flowerGrid");
+const addonStepEl = document.getElementById("addonStep");
+const addonChoicesEl = document.getElementById("addonChoices");
+const wrapStepEl = document.getElementById("wrapStep");
+const wrapChoicesEl = document.getElementById("wrapChoices");
+const stemCountEl = document.getElementById("stemCount");
+
+const customizerState = {
+  flowers: [],
+  addons: [],
+  wraps: [],
+  flowerIdx: 0,
+  qty: CONFIG.MIN_CUSTOM_QTY,
+  addonIdx: -1, // -1 = none
+  wrapIdx: 0,
+};
+
+function renumberSteps() {
+  const steps = [
+    document.querySelector('[data-step="item"] .step-num'),
+    document.querySelector('[data-step="qty"] .step-num'),
+    !addonStepEl.hidden ? addonStepEl.querySelector(".step-num") : null,
+    !wrapStepEl.hidden ? wrapStepEl.querySelector(".step-num") : null,
+  ].filter(Boolean);
+  steps.forEach((el, i) => { el.textContent = i + 1; });
+}
+
+function renderFlowerGrid() {
+  flowerGridEl.innerHTML = customizerState.flowers.map((p, i) => `
+    <button type="button" class="flower-option ${i === customizerState.flowerIdx ? "selected" : ""}" data-idx="${i}">
+      <span class="thumb">
+        ${p.image ? `<img src="${p.image}" alt="${p.name}">` : placeholderIcon(p.category)}
+      </span>
+      <span class="flabel">${p.name}<span class="fprice">${money(p.price)} <span class="en">each</span><span class="np">प्रत्येक</span></span></span>
+    </button>
+  `).join("");
+
+  flowerGridEl.querySelectorAll(".flower-option").forEach(btn => {
+    btn.addEventListener("click", () => {
+      customizerState.flowerIdx = parseInt(btn.dataset.idx, 10);
+      flowerGridEl.querySelectorAll(".flower-option").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      updateCustomizerSummary();
+    });
+  });
+}
+
+function renderAddonChoices() {
+  const noneBtn = `<button type="button" class="pill-choice ${customizerState.addonIdx === -1 ? "selected" : ""}" data-idx="-1"><span class="en">No extra</span><span class="np">थप केही छैन</span></button>`;
+  const addonBtns = customizerState.addons.map((p, i) => `
+    <button type="button" class="pill-choice ${i === customizerState.addonIdx ? "selected" : ""}" data-idx="${i}">
+      ${p.name} +${money(p.price)}
+    </button>
+  `).join("");
+  addonChoicesEl.innerHTML = noneBtn + addonBtns;
+
+  addonChoicesEl.querySelectorAll(".pill-choice").forEach(btn => {
+    btn.addEventListener("click", () => {
+      customizerState.addonIdx = parseInt(btn.dataset.idx, 10);
+      addonChoicesEl.querySelectorAll(".pill-choice").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      updateCustomizerSummary();
+    });
+  });
+}
+
+function renderWrapChoices() {
+  wrapChoicesEl.innerHTML = customizerState.wraps.map((p, i) => `
+    <button type="button" class="pill-choice ${i === customizerState.wrapIdx ? "selected" : ""}" data-idx="${i}">
+      ${p.name} +${money(p.price)}
+    </button>
+  `).join("");
+
+  wrapChoicesEl.querySelectorAll(".pill-choice").forEach(btn => {
+    btn.addEventListener("click", () => {
+      customizerState.wrapIdx = parseInt(btn.dataset.idx, 10);
+      wrapChoicesEl.querySelectorAll(".pill-choice").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      updateCustomizerSummary();
+    });
+  });
+}
+
+function updateCustomizerSummary() {
+  if (!customizerState.flowers.length) return;
+  const flower = customizerState.flowers[customizerState.flowerIdx];
+  const addon = customizerState.addonIdx > -1 ? customizerState.addons[customizerState.addonIdx] : null;
+  const wrap = customizerState.wraps.length ? customizerState.wraps[customizerState.wrapIdx] : null;
+
+  const itemTotal = flower.price * customizerState.qty;
+  const addonPrice = addon ? addon.price : 0;
+  const wrapPrice = wrap ? wrap.price : 0;
+  const total = itemTotal + addonPrice + wrapPrice;
+
+  stemCountEl.textContent = customizerState.qty;
+
+  document.getElementById("sumItemLabel").textContent = `${customizerState.qty} × ${flower.name}`;
+  document.getElementById("sumItemPrice").textContent = money(itemTotal);
+  document.getElementById("sumAddonPrice").textContent = addon ? money(addonPrice) : "—";
+  document.getElementById("sumWrapPrice").textContent = wrap ? money(wrapPrice) : "—";
+  document.getElementById("sumTotal").textContent = money(total);
+
+  const lang = currentLang();
+  const orderBtn = document.getElementById("configOrderBtn");
+  const lines = lang === "np"
+    ? [
+        `नमस्ते ${CONFIG.SHOP_NAME_NP}! 🌸`,
+        `मलाई यसरी अर्डर गर्नु छ:`,
+        `- ${customizerState.qty} x ${flower.name}`,
+        addon ? `- थप वस्तु: ${addon.name}` : null,
+        wrap ? `- र्‍यापिङ: ${wrap.name}` : null,
+        `अनुमानित जम्मा: ${money(total)}`,
+        ``,
+        `कृपया उपलब्धता र डेलिभरी बारे जानकारी दिनुहोस्।`,
+      ]
+    : [
+        `Hi ${CONFIG.SHOP_NAME}! 🌸`,
+        `I'd like to order:`,
+        `- ${customizerState.qty} x ${flower.name}`,
+        addon ? `- Add-on: ${addon.name}` : null,
+        wrap ? `- Wrapping: ${wrap.name}` : null,
+        `Estimated total: ${money(total)}`,
+        ``,
+        `Could you confirm availability and delivery? Thank you!`,
+      ];
+  const msg = lines.filter(Boolean).join("\n");
+  orderBtn.href = `https://wa.me/${CONFIG.WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+}
+
+function buildCustomizer(products) {
+  customizerState.flowers = products.filter(p => p.customizerRole === "flower" && p.inStock);
+  customizerState.addons = products.filter(p => p.customizerRole === "addon" && p.inStock);
+  customizerState.wraps = products.filter(p => p.customizerRole === "wrap" && p.inStock);
+
+  if (!customizerState.flowers.length) {
+    customizerSection.hidden = true;
+    return;
+  }
+  customizerSection.hidden = false;
+
+  addonStepEl.hidden = customizerState.addons.length === 0;
+  wrapStepEl.hidden = customizerState.wraps.length === 0;
+
+  renderFlowerGrid();
+  renderAddonChoices();
+  renderWrapChoices();
+  renumberSteps();
+  updateCustomizerSummary();
+
+  document.getElementById("stemDec").addEventListener("click", () => {
+    customizerState.qty = Math.max(CONFIG.MIN_CUSTOM_QTY, customizerState.qty - 1);
+    updateCustomizerSummary();
+  });
+  document.getElementById("stemInc").addEventListener("click", () => {
+    customizerState.qty = Math.min(CONFIG.MAX_CUSTOM_QTY, customizerState.qty + 1);
+    updateCustomizerSummary();
+  });
+}
+
+function getCSVUrl(url) {
+  if (!url) return "";
+  if (url.includes("/pub?") || url.includes("output=csv") || url.includes("format=csv")) {
+    return url;
+  }
+  const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  if (match) {
+    const docId = match[1];
+    const gidMatch = url.match(/[?&]gid=([0-9]+)/);
+    const gid = gidMatch ? gidMatch[1] : "0";
+    return `https://docs.google.com/spreadsheets/d/${docId}/export?format=csv&gid=${gid}`;
+  }
+  return url;
+}
+
+/* ===========================================================
+   Boot
+=========================================================== */
+async function init() {
+  wireFooterLinks();
+  wireLangToggle();
+
+  if (!CONFIG.SHEET_CSV_URL || CONFIG.SHEET_CSV_URL.includes("PASTE_YOUR")) {
+    loadErrorEl.hidden = false;
+    customizerSection.hidden = true;
+    return;
+  }
+
+  renderSkeleton();
+
+  try {
+    const csvUrl = getCSVUrl(CONFIG.SHEET_CSV_URL);
+    const res = await fetch(csvUrl, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    allProducts = rowsToProducts(parseCSV(text));
+    renderFilters();
+    renderShelf();
+    buildCustomizer(allProducts);
+  } catch (err) {
+    console.error("Failed to load product sheet:", err);
+    loadErrorEl.hidden = false;
+    customizerSection.hidden = true;
+  }
+}
+
+init();
