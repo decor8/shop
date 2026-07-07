@@ -45,6 +45,14 @@ const STRINGS = {
     en: (h) => `Message your order to @${h} on Instagram.`,
     np: (h) => `आफ्नो अर्डर Instagram मा @${h} लाई म्यासेज गर्नुहोस्।`,
   },
+  viberCopied: {
+    en: "Order details copied — paste them into Viber chat.",
+    np: "अर्डर विवरण कपी भयो — Viber च्याटमा पेस्ट गर्नुहोस्।",
+  },
+  viberFallback: {
+    en: (num) => `Message your order to ${num} on Viber.`,
+    np: (num) => `आफ्नो अर्डर Viber मा ${num} लाई म्यासेज गर्नुहोस्।`,
+  },
   each: { en: "each", np: "प्रत्येक" },
   noExtra: { en: "No extra", np: "थप केही छैन" },
   linkCopied: { en: "Link copied to clipboard.", np: "लिंक कपी भयो।" },
@@ -323,7 +331,11 @@ function renderShelf() {
           : placeholderIcon(product.category)}
         <div class="sold-out-badge"><span class="en">Sold out</span><span class="np">बिक्री सकियो</span></div>
         ${product.images.length > 1
-          ? `<div class="img-dots">${product.images.map((_, di) => `<span class="img-dot${di === 0 ? " active" : ""}"></span>`).join("")}</div>`
+          ? `
+          <button type="button" class="nav-arrow prev" data-action="prev-img" aria-label="Previous image"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" class="nav-arrow next" data-action="next-img" aria-label="Next image"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="img-dots">${product.images.map((_, di) => `<span class="img-dot${di === 0 ? " active" : ""}"></span>`).join("")}</div>
+          `
           : ""}
       </div>
       <div class="price-tag">${money(product.price)}</div>
@@ -349,6 +361,9 @@ function renderShelf() {
               : `<span class="en">Sold out</span><span class="np">बिक्री सकियो</span>`}
           </button>
           ${product.inStock ? `
+          <button type="button" class="order-btn viber" data-channel="viber">
+            Viber
+          </button>
           <button type="button" class="order-btn instagram" data-channel="instagram">
             DM
           </button>` : ""}
@@ -373,6 +388,21 @@ function renderShelf() {
         const qty = parseInt(output.textContent, 10);
         const msg = buildOrderMessage(product, qty);
         window.open(`https://wa.me/${CONFIG.WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
+      });
+    }
+
+    const viberBtn = card.querySelector('[data-channel="viber"]');
+    if (viberBtn) {
+      viberBtn.addEventListener("click", async () => {
+        const qty = parseInt(output.textContent, 10);
+        const msg = buildOrderMessage(product, qty);
+        try {
+          await navigator.clipboard.writeText(msg);
+          showToast(t("viberCopied"));
+        } catch {
+          showToast(t("viberFallback", CONFIG.WHATSAPP_NUMBER));
+        }
+        window.open(`viber://chat?number=${CONFIG.WHATSAPP_NUMBER}`, "_blank", "noopener");
       });
     }
 
@@ -414,6 +444,7 @@ function renderShelf() {
           const tmp = document.createElement("div");
           tmp.innerHTML = placeholderIcon(product.category);
           mediaEl.querySelector(".img-dots")?.remove();
+          mediaEl.querySelectorAll(".nav-arrow")?.forEach(a => a.remove());
           imgEl.replaceWith(tmp.firstElementChild);
           return;
         }
@@ -429,6 +460,22 @@ function renderShelf() {
             showImage(di);
           });
         });
+
+        const prevBtn = mediaEl.querySelector('[data-action="prev-img"]');
+        const nextBtn = mediaEl.querySelector('[data-action="next-img"]');
+
+        if (prevBtn) {
+          prevBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            showImage((idx - 1 + product.images.length) % product.images.length);
+          });
+        }
+        if (nextBtn) {
+          nextBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            showImage((idx + 1) % product.images.length);
+          });
+        }
       }
     }
   });
@@ -450,8 +497,11 @@ function highlightSharedItem() {
 
 function wireFooterLinks() {
   const waLink = `https://wa.me/${CONFIG.WHATSAPP_NUMBER}`;
+  const viberLink = `viber://chat?number=${CONFIG.WHATSAPP_NUMBER}`;
   document.getElementById("footer-whatsapp").href = waLink;
   document.getElementById("empty-whatsapp-link").href = waLink;
+  const footerViber = document.getElementById("footer-viber");
+  if (footerViber) footerViber.href = viberLink;
   document.getElementById("footer-instagram").href = `https://instagram.com/${CONFIG.INSTAGRAM_HANDLE}`;
   const topbarWa = document.getElementById("topbar-whatsapp");
   if (topbarWa) topbarWa.href = waLink;
@@ -617,6 +667,10 @@ function updateCustomizerSummary() {
       ];
   const msg = lines.filter(Boolean).join("\n");
   orderBtn.href = `https://wa.me/${CONFIG.WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+  const viberBtn = document.getElementById("configViberBtn");
+  if (viberBtn) {
+    viberBtn.dataset.msg = msg;
+  }
 }
 
 function buildCustomizer(products) {
@@ -647,6 +701,20 @@ function buildCustomizer(products) {
     customizerState.qty = Math.min(CONFIG.MAX_CUSTOM_QTY, customizerState.qty + 1);
     updateCustomizerSummary();
   });
+
+  const configViberBtn = document.getElementById("configViberBtn");
+  if (configViberBtn) {
+    configViberBtn.addEventListener("click", async () => {
+      const msg = configViberBtn.dataset.msg || "";
+      try {
+        await navigator.clipboard.writeText(msg);
+        showToast(t("viberCopied"));
+      } catch {
+        showToast(t("viberFallback", CONFIG.WHATSAPP_NUMBER));
+      }
+      window.open(`viber://chat?number=${CONFIG.WHATSAPP_NUMBER}`, "_blank", "noopener");
+    });
+  }
 }
 
 function getCSVUrl(url) {

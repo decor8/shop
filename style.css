@@ -833,3 +833,89 @@ body.lang-np .footer-inner{ font-family: var(--font-np); }
   .order-actions{ flex-direction: column; }
   .order-btn.instagram{ padding-left: 12px; padding-right: 12px; }
 }
+
+/* ---------------- Card Media Navigation Arrows ---------------- */
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(239, 230, 212, 0.75);
+  border: 1.5px solid var(--line);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 5;
+  opacity: 0;
+  pointer-events: auto;
+  transition: opacity 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+.nav-arrow:hover {
+  background: var(--paper-raised);
+  transform: translateY(-50%) scale(1.1);
+}
+.nav-arrow:active {
+  transform: translateY(-50%) scale(0.95);
+}
+.nav-arrow.prev {
+  left: 8px;
+}
+.nav-arrow.next {
+  right: 8px;
+}
+.card:hover .nav-arrow {
+  opacity: 1;
+}
+.nav-arrow svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+@media (hover: none) {
+  .nav-arrow {
+    opacity: 0.85;
+  }
+}
+
+/* ---------------- Viber Order buttons & layouts ---------------- */
+.order-btn.viber {
+  background: #7360f2;
+  color: var(--paper-raised);
+  flex: 0 0 auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.customizer-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.customizer-actions .config-order-btn {
+  margin-top: 0;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.customizer-actions .config-order-btn.viber {
+  background: #7360f2;
+  color: var(--paper-raised);
+}
+
+@media (min-width: 600px) {
+  .customizer-actions {
+    flex-direction: row;
+  }
+  .customizer-actions .config-order-btn {
+    flex: 1;
+  }
+}
