@@ -7,14 +7,14 @@ const CONFIG = {
   // Publish your Google Sheet: File > Share > Publish to web >
   // choose the product sheet/tab > CSV > Publish, then paste the
   // link it gives you here.
-  SHEET_CSV_URL: "https://docs.google.com/spreadsheets/d/1TKVFZXRoAT2CzLqTNZsIfo7W4pIc4y1hAWZWXWHxDLc/edit?gid=0#gid=0",
+  SHEET_CSV_URL: "PASTE_YOUR_PUBLISHED_GOOGLE_SHEET_CSV_LINK_HERE",
 
   // WhatsApp number in international format, digits only, no + or spaces.
   // Example: Nepal number 98XXXXXXXX with country code 977 -> "97798XXXXXXXX"
-  WHATSAPP_NUMBER: "9779860588764",
+  WHATSAPP_NUMBER: "97798XXXXXXXX",
 
   // Instagram handle, without the @
-  INSTAGRAM_HANDLE: "FulKoPaila",
+  INSTAGRAM_HANDLE: "fulkopaila",
 
   CURRENCY_PREFIX: "Rs. ",
 
@@ -47,6 +47,7 @@ const STRINGS = {
   },
   each: { en: "each", np: "प्रत्येक" },
   noExtra: { en: "No extra", np: "थप केही छैन" },
+  linkCopied: { en: "Link copied to clipboard.", np: "लिंक कपी भयो।" },
 };
 
 function currentLang() {
@@ -102,11 +103,14 @@ function rowsToProducts(rows) {
   const iDesc = idx("description");
   const iRole = idx("customizer role");
 
-  return rows.slice(1).map((r, i) => {
+  const products = rows.slice(1).map((r, i) => {
     const stockRaw = (iStock > -1 ? r[iStock] : "yes").trim().toLowerCase();
     const inStock = !["no", "false", "0", "sold out"].includes(stockRaw);
     const priceNum = parseFloat((iPrice > -1 ? r[iPrice] : "0").replace(/[^\d.]/g, "")) || 0;
     const roleRaw = (iRole > -1 ? r[iRole] : "").trim().toLowerCase();
+    const imageRaw = (iImage > -1 ? r[iImage] : "").trim();
+    // Supports one image, or several separated by commas and/or spaces.
+    const images = imageRaw ? imageRaw.split(/[,\s]+/).map(s => s.trim()).filter(Boolean) : [];
 
     return {
       id: `p${i}`,
@@ -114,12 +118,33 @@ function rowsToProducts(rows) {
       category: (iCategory > -1 ? r[iCategory] : "Other").trim(),
       variant: (iVariant > -1 ? r[iVariant] : "").trim(),
       price: priceNum,
-      image: (iImage > -1 ? r[iImage] : "").trim(),
+      images,
       inStock,
       description: (iDesc > -1 ? r[iDesc] : "").trim(),
       customizerRole: roleRaw, // "flower" | "addon" | "wrap" | ""
     };
   }).filter(p => p.name && p.name !== "Untitled");
+
+  // Give each product a stable, human-readable slug (derived from its name)
+  // so items can be linked to directly, e.g. yoursite.com/#item=rose-candle.
+  // If two products share a name, later ones get -2, -3, etc.
+  const slugCounts = {};
+  products.forEach(p => {
+    const base = slugify(p.name);
+    slugCounts[base] = (slugCounts[base] || 0) + 1;
+    p.slug = slugCounts[base] > 1 ? `${base}-${slugCounts[base]}` : base;
+  });
+
+  return products;
+}
+
+function slugify(str) {
+  const s = (str || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\u0900-\u097F]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return s || "item";
 }
 
 /* ===========================================================
@@ -181,12 +206,48 @@ function money(n) {
   return `${CONFIG.CURRENCY_PREFIX}${n.toLocaleString()}`;
 }
 
+function shareUrlFor(product) {
+  const base = location.origin + location.pathname;
+  return `${base}#item=${encodeURIComponent(product.slug)}`;
+}
+
+async function shareProduct(product) {
+  const url = shareUrlFor(product);
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: product.name, text: `${product.name} — ${money(product.price)}`, url });
+    } catch {
+      /* user cancelled the share sheet — nothing to do */
+    }
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    showToast(t("linkCopied"));
+  } catch {
+    showToast(url);
+  }
+}
+
+// If a sheet's Image URL is broken, wrong format, or blocked (common with
+// Google Drive "view" links), swap in the placeholder icon instead of
+// showing the browser's default broken-image icon.
+function handleImgFallback(imgEl, category) {
+  imgEl.addEventListener("error", () => {
+    const tmp = document.createElement("div");
+    tmp.innerHTML = placeholderIcon(category);
+    imgEl.replaceWith(tmp.firstElementChild);
+  }, { once: true });
+}
+
 function buildOrderMessage(product, qty) {
+  const link = shareUrlFor(product);
   if (currentLang() === "np") {
     return [
       `नमस्ते ${CONFIG.SHOP_NAME_NP}! 🌸`,
       `मलाई यो अर्डर गर्नु छ:`,
       `• ${product.name}${product.variant ? " (" + product.variant + ")" : ""} × ${qty} — ${money(product.price * qty)}`,
+      `वस्तुको लिंक: ${link}`,
       ``,
       `कृपया अर्को चरण बताइदिनुहोस्। धन्यवाद!`,
     ].join("\n");
@@ -195,6 +256,7 @@ function buildOrderMessage(product, qty) {
     `Hi ${CONFIG.SHOP_NAME}! 🌸`,
     `I'd like to order:`,
     `• ${product.name}${product.variant ? " (" + product.variant + ")" : ""} × ${qty} — ${money(product.price * qty)}`,
+    `Item link: ${link}`,
     ``,
     `Could you let me know the next steps? Thank you!`,
   ].join("\n");
@@ -247,6 +309,7 @@ function renderShelf() {
     const card = document.createElement("article");
     card.className = "card" + (product.inStock ? "" : " sold-out");
     card.style.animationDelay = `${Math.min(i, 8) * 45}ms`;
+    card.dataset.slug = product.slug;
 
     const accent = accentFor(product.category);
     card.style.setProperty("--accent", accent.strong);
@@ -255,10 +318,13 @@ function renderShelf() {
 
     card.innerHTML = `
       <div class="card-media">
-        ${product.image
-          ? `<img src="${product.image}" alt="${product.name}" loading="lazy">`
+        ${product.images.length
+          ? `<img src="${product.images[0]}" alt="${product.name}" loading="lazy">`
           : placeholderIcon(product.category)}
         <div class="sold-out-badge"><span class="en">Sold out</span><span class="np">बिक्री सकियो</span></div>
+        ${product.images.length > 1
+          ? `<div class="img-dots">${product.images.map((_, di) => `<span class="img-dot${di === 0 ? " active" : ""}"></span>`).join("")}</div>`
+          : ""}
       </div>
       <div class="price-tag">${money(product.price)}</div>
       <div class="card-body">
@@ -286,6 +352,9 @@ function renderShelf() {
           <button type="button" class="order-btn instagram" data-channel="instagram">
             DM
           </button>` : ""}
+          <button type="button" class="order-btn share" data-channel="share" aria-label="Share this item">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M8 7l4-4 4 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
       </div>
     `;
@@ -322,8 +391,61 @@ function renderShelf() {
       });
     }
 
+    card.querySelector('[data-channel="share"]').addEventListener("click", () => shareProduct(product));
+
     shelfEl.appendChild(card);
+
+    if (product.images.length) {
+      const mediaEl = card.querySelector(".card-media");
+      const imgEl = mediaEl.querySelector("img");
+      const dotEls = mediaEl.querySelectorAll(".img-dot");
+      let idx = 0;
+      let failCount = 0;
+
+      const showImage = (newIdx) => {
+        idx = newIdx;
+        imgEl.src = product.images[idx];
+        dotEls.forEach((d, di) => d.classList.toggle("active", di === idx));
+      };
+
+      imgEl.addEventListener("error", () => {
+        failCount++;
+        if (failCount >= product.images.length) {
+          const tmp = document.createElement("div");
+          tmp.innerHTML = placeholderIcon(product.category);
+          mediaEl.querySelector(".img-dots")?.remove();
+          imgEl.replaceWith(tmp.firstElementChild);
+          return;
+        }
+        showImage((idx + 1) % product.images.length);
+      });
+
+      if (product.images.length > 1) {
+        mediaEl.style.cursor = "pointer";
+        mediaEl.addEventListener("click", () => showImage((idx + 1) % product.images.length));
+        dotEls.forEach((dot, di) => {
+          dot.addEventListener("click", (e) => {
+            e.stopPropagation();
+            showImage(di);
+          });
+        });
+      }
+    }
   });
+}
+
+// If the page was opened via a shared item link (#item=slug), scroll to
+// that card and give it a brief highlight so it's obvious which one it is.
+function highlightSharedItem() {
+  if (!location.hash) return;
+  const params = new URLSearchParams(location.hash.slice(1));
+  const slug = params.get("item");
+  if (!slug) return;
+  const card = shelfEl.querySelector(`[data-slug="${CSS.escape(slug)}"]`);
+  if (!card) return;
+  card.scrollIntoView({ behavior: "smooth", block: "center" });
+  card.classList.add("shared-highlight");
+  setTimeout(() => card.classList.remove("shared-highlight"), 2600);
 }
 
 function wireFooterLinks() {
@@ -393,7 +515,7 @@ function renderFlowerGrid() {
   flowerGridEl.innerHTML = customizerState.flowers.map((p, i) => `
     <button type="button" class="flower-option ${i === customizerState.flowerIdx ? "selected" : ""}" data-idx="${i}">
       <span class="thumb">
-        ${p.image ? `<img src="${p.image}" alt="${p.name}">` : placeholderIcon(p.category)}
+        ${p.images.length ? `<img src="${p.images[0]}" alt="${p.name}">` : placeholderIcon(p.category)}
       </span>
       <span class="flabel">${p.name}<span class="fprice">${money(p.price)} <span class="en">each</span><span class="np">प्रत्येक</span></span></span>
     </button>
@@ -406,6 +528,9 @@ function renderFlowerGrid() {
       btn.classList.add("selected");
       updateCustomizerSummary();
     });
+    const idx = parseInt(btn.dataset.idx, 10);
+    const img = btn.querySelector(".thumb img");
+    if (img) handleImgFallback(img, customizerState.flowers[idx].category);
   });
 }
 
@@ -466,6 +591,7 @@ function updateCustomizerSummary() {
 
   const lang = currentLang();
   const orderBtn = document.getElementById("configOrderBtn");
+  const link = shareUrlFor(flower);
   const lines = lang === "np"
     ? [
         `नमस्ते ${CONFIG.SHOP_NAME_NP}! 🌸`,
@@ -474,6 +600,7 @@ function updateCustomizerSummary() {
         addon ? `- थप वस्तु: ${addon.name}` : null,
         wrap ? `- र्‍यापिङ: ${wrap.name}` : null,
         `अनुमानित जम्मा: ${money(total)}`,
+        `वस्तुको लिंक: ${link}`,
         ``,
         `कृपया उपलब्धता र डेलिभरी बारे जानकारी दिनुहोस्।`,
       ]
@@ -484,6 +611,7 @@ function updateCustomizerSummary() {
         addon ? `- Add-on: ${addon.name}` : null,
         wrap ? `- Wrapping: ${wrap.name}` : null,
         `Estimated total: ${money(total)}`,
+        `Item link: ${link}`,
         ``,
         `Could you confirm availability and delivery? Thank you!`,
       ];
@@ -521,21 +649,6 @@ function buildCustomizer(products) {
   });
 }
 
-function getCSVUrl(url) {
-  if (!url) return "";
-  if (url.includes("/pub?") || url.includes("output=csv") || url.includes("format=csv")) {
-    return url;
-  }
-  const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-  if (match) {
-    const docId = match[1];
-    const gidMatch = url.match(/[?&]gid=([0-9]+)/);
-    const gid = gidMatch ? gidMatch[1] : "0";
-    return `https://docs.google.com/spreadsheets/d/${docId}/export?format=csv&gid=${gid}`;
-  }
-  return url;
-}
-
 /* ===========================================================
    Boot
 =========================================================== */
@@ -552,14 +665,14 @@ async function init() {
   renderSkeleton();
 
   try {
-    const csvUrl = getCSVUrl(CONFIG.SHEET_CSV_URL);
-    const res = await fetch(csvUrl, { cache: "no-store" });
+    const res = await fetch(CONFIG.SHEET_CSV_URL, { cache: "no-store" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
     allProducts = rowsToProducts(parseCSV(text));
     renderFilters();
     renderShelf();
     buildCustomizer(allProducts);
+    highlightSharedItem();
   } catch (err) {
     console.error("Failed to load product sheet:", err);
     loadErrorEl.hidden = false;

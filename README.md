@@ -31,7 +31,10 @@ Notes:
   later, so new product lines never look broken without photos. To get an
   image URL, upload the photo somewhere public (e.g. an "Anyone with the
   link" Google Drive image, imgur, or your own GitHub repo) and paste the
-  direct link.
+  direct link. **Want more than one photo per item?** Paste several links
+  separated by a comma or a space (e.g. `link1.jpg, link2.jpg, link3.jpg`) —
+  the card will show small dots under the photo, and tapping the image
+  cycles through them.
 - **In Stock**: type `Yes` or `No`. Anything other than `No`/`False`/`0` counts
   as in stock.
 - **Customizer Role** is optional and only matters for the "Build your own"
@@ -111,6 +114,24 @@ both language modes since it's your own text either way.
 
 Every time you edit the sheet, the live site updates automatically the next
 time someone loads the page — no rebuild or redeploy needed.
+
+## 7. Sharing and item links
+
+Every card has a small share icon next to the order buttons. On phones,
+tapping it opens the native share sheet (so a customer can send the item
+straight to WhatsApp, Instagram, Messages, wherever) — on devices/browsers
+without that feature, it copies a direct link to the clipboard instead.
+
+Each product also gets a stable link automatically, based on its name (e.g.
+`yoursite.github.io/#item=rose-candle`) — no setup needed. Opening that link
+scrolls straight to that item and briefly highlights it. This same link is
+now included at the bottom of every WhatsApp/Instagram order message, so you
+always know exactly which item (and which photo set) a customer means.
+
+One thing worth knowing: the link is generated from the product's *name*. If
+you rename an item later, its old shared links will stop pointing to it —
+this is a reasonable tradeoff for not needing a separate ID column, but keep
+it in mind if you're renaming something customers may have already shared.
 
 ## Customizing the look
 

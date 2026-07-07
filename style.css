@@ -338,6 +338,7 @@ body.lang-np .filter-btn{ font-family: var(--font-np); text-transform: none; let
 }
 
 .card-media{
+  position: relative;
   aspect-ratio: 1 / 1;
   border-radius: 4px 18px 0 0;
   overflow: hidden;
@@ -364,6 +365,31 @@ body.lang-np .filter-btn{ font-family: var(--font-np); text-transform: none; let
   stroke: var(--moss-deep);
   fill: none;
   stroke-width: 2.4;
+}
+
+.img-dots{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 8px;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  pointer-events: none;
+}
+.img-dot{
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(43,36,29,0.25);
+  pointer-events: auto;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.img-dot.active{
+  background: var(--marigold);
+  transform: scale(1.25);
 }
 
 .card-body{
@@ -512,11 +538,26 @@ body.lang-np .order-btn{ font-family: var(--font-np); }
 .order-btn:focus-visible{ outline: 2px solid var(--ink); outline-offset: 2px; }
 .order-btn.whatsapp{ background: var(--moss); color: var(--paper-raised); }
 .order-btn.instagram{ background: var(--thread); color: var(--paper-raised); flex: 0 0 auto; padding-left: 16px; padding-right: 16px; }
+.order-btn.share{
+  background: var(--paper);
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  flex: 0 0 auto;
+  padding: 9px 12px;
+}
+.order-btn.share:hover{ color: var(--ink); border-color: var(--ink-soft); }
+.order-btn.share svg{ width: 16px; height: 16px; }
 .order-btn[disabled]{
   background: var(--line);
   color: var(--ink-soft);
   cursor: not-allowed;
   filter: none;
+}
+
+/* Briefly highlighted when a shared item link opens directly to this card */
+.card.shared-highlight{
+  box-shadow: 0 0 0 4px rgba(227,154,52,0.55), 0 14px 26px var(--accent-shadow, rgba(43,36,29,0.16));
+  transition: box-shadow 0.4s ease;
 }
 
 /* ---------------- Loading skeletons ---------------- */
