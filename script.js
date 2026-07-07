@@ -7,14 +7,14 @@ const CONFIG = {
   // Publish your Google Sheet: File > Share > Publish to web >
   // choose the product sheet/tab > CSV > Publish, then paste the
   // link it gives you here.
-  SHEET_CSV_URL: "PASTE_YOUR_PUBLISHED_GOOGLE_SHEET_CSV_LINK_HERE",
+  SHEET_CSV_URL: "https://docs.google.com/spreadsheets/d/1TKVFZXRoAT2CzLqTNZsIfo7W4pIc4y1hAWZWXWHxDLc/edit?gid=0#gid=0",
 
   // WhatsApp number in international format, digits only, no + or spaces.
   // Example: Nepal number 98XXXXXXXX with country code 977 -> "97798XXXXXXXX"
-  WHATSAPP_NUMBER: "97798XXXXXXXX",
+  WHATSAPP_NUMBER: "9779860588764",
 
   // Instagram handle, without the @
-  INSTAGRAM_HANDLE: "fulkopaila",
+  INSTAGRAM_HANDLE: "FulKoPaila",
 
   CURRENCY_PREFIX: "Rs. ",
 
@@ -649,6 +649,21 @@ function buildCustomizer(products) {
   });
 }
 
+function getCSVUrl(url) {
+  if (!url) return "";
+  if (url.includes("/pub?") || url.includes("output=csv") || url.includes("format=csv")) {
+    return url;
+  }
+  const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  if (match) {
+    const docId = match[1];
+    const gidMatch = url.match(/[?&]gid=([0-9]+)/);
+    const gid = gidMatch ? gidMatch[1] : "0";
+    return `https://docs.google.com/spreadsheets/d/${docId}/export?format=csv&gid=${gid}`;
+  }
+  return url;
+}
+
 /* ===========================================================
    Boot
 =========================================================== */
@@ -665,7 +680,8 @@ async function init() {
   renderSkeleton();
 
   try {
-    const res = await fetch(CONFIG.SHEET_CSV_URL, { cache: "no-store" });
+    const csvUrl = getCSVUrl(CONFIG.SHEET_CSV_URL);
+    const res = await fetch(csvUrl, { cache: "no-store" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
     allProducts = rowsToProducts(parseCSV(text));
