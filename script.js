@@ -386,9 +386,6 @@ function renderShelf() {
           ${product.inStock ? `
           <button type="button" class="order-btn copy-msg" data-channel="copy-msg">
             <span class="en">Copy Link</span><span class="np">लिंक कपी</span>
-          </button>
-          <button type="button" class="order-btn instagram" data-channel="instagram">
-            DM
           </button>` : ""}
           <button type="button" class="order-btn share" data-channel="share" aria-label="Share this item">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M8 7l4-4 4 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -427,21 +424,6 @@ function renderShelf() {
           await navigator.clipboard.writeText(url);
           showToast(t("linkCopied"));
         }
-      });
-    }
-
-    const igBtn = card.querySelector('[data-channel="instagram"]');
-    if (igBtn) {
-      igBtn.addEventListener("click", async () => {
-        const qty = parseInt(output.textContent, 10);
-        const msg = buildOrderMessage(product, qty);
-        try {
-          await navigator.clipboard.writeText(msg);
-          showToast(t("igCopied"));
-        } catch {
-          showToast(t("igFallback", CONFIG.INSTAGRAM_HANDLE));
-        }
-        window.open(`https://ig.me/m/${CONFIG.INSTAGRAM_HANDLE}`, "_blank", "noopener");
       });
     }
 
