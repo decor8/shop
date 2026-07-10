@@ -59,6 +59,30 @@ automatically hides itself — so it's safe to ignore this column entirely
 until you're ready to use it. Add-on and wrapping steps each hide themselves
 too if you haven't tagged anything for that role.
 
+## 2b. The Settings sheet (Contact & Social links)
+
+To manage the contact links, phone number, physical address, and social media handles shown in the top contact bar, add a second tab (worksheet) named **`Settings`** inside the same Google Sheet.
+
+Create two columns in this sheet:
+- **`Key`**: The name of the setting.
+- **`Value`**: The actual link, number, or text.
+
+| Key | Value | Description |
+|---|---|---|
+| `whatsapp_number` | 9779860588764 | Country code + number, digits only |
+| `viber_number` | 9779860588764 | Country code + number, digits only (for Viber order/contact) |
+| `phone_number` | 9860588764 | Digits only (for voice calling and Save Contact card) |
+| `instagram_handle`| FulKoPaila | Handle or full Instagram profile URL |
+| `facebook_url` | https://facebook.com/fulkopaila | Full Facebook profile/page URL |
+| `tiktok_url` | https://tiktok.com/@fulkopaila | Full TikTok profile URL |
+| `google_map_url` | https://maps.app.goo.gl/xxxxxx | Google Maps location link |
+| `shop_address` | Lalitpur, Nepal | Shop location text (English) |
+| `shop_address_np`| ललितपुर, नेपाल | Shop location text (Nepali) |
+| `shop_name` | Ful ko Paila | Shop brand name (English) |
+| `shop_name_np` | फुलको पाइला | Shop brand name (Nepali) |
+
+Make sure the Google Sheet document is published to the web (File > Share > Publish to web) so the site can read both tabs. The app will automatically load settings from the `Settings` tab if it exists, otherwise it will safely fall back to the default parameters defined in `script.js`.
+
 ## 3. Publish the sheet as CSV
 
 1. In Google Sheets: **File → Share → Publish to web**

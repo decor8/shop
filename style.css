@@ -76,33 +76,139 @@ body.lang-np .en{ display: none; }
 h1 .np, h2 .np, h3 .np, .brand-name .np{ font-family: var(--font-np-display); }
 
 /* ---------------- Topbar ---------------- */
-.topbar{
+.topbar {
   position: sticky;
   top: 0;
   z-index: 60;
   background: var(--ink);
   color: var(--paper-raised);
-  padding: 12px 0;
+  padding: 14px 0;
   border-bottom: 2px solid var(--marigold);
 }
-.topbar-inner{
+.topbar-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
 }
-.topbar .brand{
+.topbar .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
 }
-.topbar .brand-mark{ width: 36px; display: inline-flex; }
-.topbar .wire-line path{ stroke: var(--marigold); stroke-width: 3; fill: none; stroke-linecap: round; }
-.topbar .brand-name{
+.topbar .brand-mark {
+  width: 38px;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.topbar .wire-line path {
+  stroke: var(--marigold);
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+}
+.topbar .brand-name {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 1.15rem;
+  font-size: 1.25rem;
 }
+
+/* ---------------- Contact Ribbon ---------------- */
+.contact-ribbon {
+  background: rgba(0, 0, 0, 0.18);
+  border-top: 1.5px solid rgba(239, 230, 212, 0.08);
+  padding: 12px 0;
+  width: 100%;
+}
+.contact-ribbon-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.ribbon-socials, .ribbon-contacts {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.ribbon-link {
+  color: #c9bfac;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.ribbon-link:hover {
+  color: var(--marigold);
+  transform: translateY(-2px);
+}
+.ribbon-link .icon {
+  width: 28px; /* Prominent icon size alongside text labels */
+  height: 28px;
+  display: block;
+  flex-shrink: 0;
+}
+.ribbon-link .link-text {
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: var(--font-body);
+}
+body.lang-np .ribbon-link .link-text {
+  font-family: var(--font-np);
+}
+.contact-ribbon .sep {
+  display: inline-block;
+  width: 1px;
+  height: 24px;
+  background: rgba(239, 230, 212, 0.15);
+  margin: 0 6px;
+  user-select: none;
+}
+.ribbon-save-contact-btn {
+  background: rgba(227, 154, 52, 0.12);
+  color: var(--marigold);
+  border: 1px solid rgba(227, 154, 52, 0.35);
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: var(--font-body);
+}
+body.lang-np .ribbon-save-contact-btn {
+  font-family: var(--font-np);
+}
+.ribbon-save-contact-btn:hover {
+  background: var(--marigold);
+  color: var(--ink);
+  border-color: var(--marigold);
+  transform: translateY(-1px);
+}
+.ribbon-save-contact-btn .icon {
+  width: 14px;
+  height: 14px;
+}
+
+@media (max-width: 768px) {
+  .topbar-inner {
+    padding-bottom: 4px;
+  }
+}
+@media (max-width: 480px) {
+  .topbar-inner {
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    text-align: center;
+  }
+}
+
 .top-actions{ display: flex; align-items: center; gap: 8px; }
 .lang-toggle{
   background: transparent;
@@ -883,14 +989,20 @@ body.lang-np .footer-inner{ font-family: var(--font-np); }
   }
 }
 
-/* ---------------- Viber Order buttons & layouts ---------------- */
-.order-btn.viber {
-  background: #7360f2;
-  color: var(--paper-raised);
+/* ---------------- Copy Order message button ---------------- */
+.order-btn.copy-msg {
+  background: rgba(62,91,68,0.06);
+  border: 1.5px solid var(--moss);
+  color: var(--moss-deep);
   flex: 0 0 auto;
-  padding-left: 16px;
-  padding-right: 16px;
+  padding-left: 14px;
+  padding-right: 14px;
 }
+.order-btn.copy-msg:hover {
+  background: var(--moss);
+  color: var(--paper-raised);
+}
+
 
 .customizer-actions {
   display: flex;
