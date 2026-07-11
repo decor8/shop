@@ -107,6 +107,13 @@ h1 .np, h2 .np, h3 .np, .brand-name .np{ font-family: var(--font-np-display); }
   fill: none;
   stroke-linecap: round;
 }
+/* Custom logo image loaded from the Settings sheet */
+.topbar .brand-logo-img {
+  max-height: 40px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
 .topbar .brand-name {
   font-family: var(--font-display);
   font-weight: 600;

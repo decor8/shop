@@ -37,6 +37,27 @@ const CONFIG = {
   // Leave blank — value is loaded from the Google Sheet Settings tab.
   TIKTOK_URL: "",
 
+  // X (Twitter) profile URL or handle (e.g. "yourhandle" or full URL)
+  X_URL: "",
+
+  // YouTube channel URL
+  YOUTUBE_URL: "",
+
+  // Threads handle or full URL (e.g. "yourhandle")
+  THREADS_HANDLE: "",
+
+  // Snapchat username
+  SNAPCHAT_HANDLE: "",
+
+  // Pinterest profile URL
+  PINTEREST_URL: "",
+
+  // LinkedIn profile/page URL
+  LINKEDIN_URL: "",
+
+  // Telegram username (without @) or full t.me link
+  TELEGRAM_USERNAME: "",
+
   // Google Map URL (optional)
   GOOGLE_MAP_URL: "",
 
@@ -52,6 +73,30 @@ const CONFIG = {
   // Minimum quantity a customer can pick in the customizer
   MIN_CUSTOM_QTY: 1,
   MAX_CUSTOM_QTY: 20,
+
+  // ── Page text content (all overridable from the Settings tab) ──────────
+  // Hero tagline. Wrap the word you want highlighted in [brackets].
+  // Example: "Every piece leaves its own [footprint] — wire blooms & scented candles."
+  TAGLINE_EN: "",
+  TAGLINE_NP: "",
+
+  // Occasion chips shown in the hero — comma-separated.
+  // Example: "Birthdays, Anniversaries, Housewarming, Just because"
+  CHIPS_EN: [],
+  CHIPS_NP: [],
+
+  // Three value-prop lines shown below the hero.
+  VALUE1_EN: "", VALUE1_NP: "",
+  VALUE2_EN: "", VALUE2_NP: "",
+  VALUE3_EN: "", VALUE3_NP: "",
+
+  // Logo image URL. If set, replaces the default wave SVG with this image.
+  // Use a square or landscape PNG/SVG, ideally under 200px tall.
+  LOGO_URL: "",
+
+  // Footer tagline text.
+  FOOTER_NOTE_EN: "",
+  FOOTER_NOTE_NP: "",
 };
 
 /* ===========================================================
@@ -582,6 +627,78 @@ function updateUtilityBar() {
     }
   }
 
+  // X (Twitter)
+  const xEl = document.getElementById("top-x");
+  if (xEl) {
+    if (CONFIG.X_URL) {
+      xEl.href = CONFIG.X_URL.startsWith("http") ? CONFIG.X_URL : `https://x.com/${CONFIG.X_URL}`;
+      xEl.style.display = "";
+      hasSocial = true;
+    } else {
+      xEl.style.display = "none";
+    }
+  }
+
+  // YouTube
+  const ytEl = document.getElementById("top-youtube");
+  if (ytEl) {
+    if (CONFIG.YOUTUBE_URL) {
+      ytEl.href = CONFIG.YOUTUBE_URL;
+      ytEl.style.display = "";
+      hasSocial = true;
+    } else {
+      ytEl.style.display = "none";
+    }
+  }
+
+  // Threads
+  const threadsEl = document.getElementById("top-threads");
+  if (threadsEl) {
+    if (CONFIG.THREADS_HANDLE) {
+      threadsEl.href = CONFIG.THREADS_HANDLE.startsWith("http") ? CONFIG.THREADS_HANDLE : `https://threads.net/@${CONFIG.THREADS_HANDLE}`;
+      threadsEl.style.display = "";
+      hasSocial = true;
+    } else {
+      threadsEl.style.display = "none";
+    }
+  }
+
+  // Snapchat
+  const scEl = document.getElementById("top-snapchat");
+  if (scEl) {
+    if (CONFIG.SNAPCHAT_HANDLE) {
+      scEl.href = `https://snapchat.com/add/${CONFIG.SNAPCHAT_HANDLE}`;
+      scEl.style.display = "";
+      hasSocial = true;
+    } else {
+      scEl.style.display = "none";
+    }
+  }
+
+  // Pinterest
+  const pinEl = document.getElementById("top-pinterest");
+  if (pinEl) {
+    if (CONFIG.PINTEREST_URL) {
+      pinEl.href = CONFIG.PINTEREST_URL;
+      pinEl.style.display = "";
+      hasSocial = true;
+    } else {
+      pinEl.style.display = "none";
+    }
+  }
+
+  // LinkedIn
+  const liEl = document.getElementById("top-linkedin");
+  if (liEl) {
+    if (CONFIG.LINKEDIN_URL) {
+      liEl.href = CONFIG.LINKEDIN_URL;
+      liEl.style.display = "";
+      hasSocial = true;
+    } else {
+      liEl.style.display = "none";
+    }
+  }
+
   // Map
   const mapEl = document.getElementById("top-map");
   if (mapEl) {
@@ -591,6 +708,18 @@ function updateUtilityBar() {
       mapEl.title = currentLang() === "np" ? (CONFIG.SHOP_ADDRESS_NP || CONFIG.SHOP_ADDRESS || "नक्सा") : (CONFIG.SHOP_ADDRESS || "Store Map");
     } else {
       mapEl.style.display = "none";
+    }
+  }
+
+  // Telegram (shown in contact group, next to WhatsApp/Viber)
+  const tgEl = document.getElementById("top-telegram");
+  if (tgEl) {
+    if (CONFIG.TELEGRAM_USERNAME) {
+      tgEl.href = CONFIG.TELEGRAM_USERNAME.startsWith("http") ? CONFIG.TELEGRAM_USERNAME : `https://t.me/${CONFIG.TELEGRAM_USERNAME}`;
+      tgEl.style.display = "";
+      hasSocial = true;
+    } else {
+      tgEl.style.display = "none";
     }
   }
 
@@ -774,6 +903,7 @@ async function loadSettings() {
   wireFooterLinks();
   updateTopbarBrand();
   updateUtilityBar();
+  updatePageTexts();
   updateCustomizerSummary();
 }
 
@@ -797,6 +927,22 @@ function applySettingRow(key, val) {
     facebook:        () => { CONFIG.FACEBOOK_URL   = val; },
     tiktok_url:      () => { CONFIG.TIKTOK_URL     = val; },
     tiktok:          () => { CONFIG.TIKTOK_URL     = val; },
+    x_url:           () => { CONFIG.X_URL           = val; },
+    x:               () => { CONFIG.X_URL           = val; },
+    twitter_url:     () => { CONFIG.X_URL           = val; },
+    twitter:         () => { CONFIG.X_URL           = val; },
+    youtube_url:     () => { CONFIG.YOUTUBE_URL     = val; },
+    youtube:         () => { CONFIG.YOUTUBE_URL     = val; },
+    threads_handle:  () => { CONFIG.THREADS_HANDLE  = val; },
+    threads:         () => { CONFIG.THREADS_HANDLE  = val; },
+    snapchat_handle: () => { CONFIG.SNAPCHAT_HANDLE = val; },
+    snapchat:        () => { CONFIG.SNAPCHAT_HANDLE = val; },
+    pinterest_url:   () => { CONFIG.PINTEREST_URL   = val; },
+    pinterest:       () => { CONFIG.PINTEREST_URL   = val; },
+    linkedin_url:    () => { CONFIG.LINKEDIN_URL    = val; },
+    linkedin:        () => { CONFIG.LINKEDIN_URL    = val; },
+    telegram_username:() => { CONFIG.TELEGRAM_USERNAME = val; },
+    telegram:        () => { CONFIG.TELEGRAM_USERNAME = val; },
     google_map_url:  () => { CONFIG.GOOGLE_MAP_URL = val; },
     google_map:      () => { CONFIG.GOOGLE_MAP_URL = val; },
     map:             () => { CONFIG.GOOGLE_MAP_URL = val; },
@@ -806,9 +952,95 @@ function applySettingRow(key, val) {
     address_np:      () => { CONFIG.SHOP_ADDRESS_NP = val; },
     shop_name:       () => { CONFIG.SHOP_NAME      = val; },
     shop_name_np:    () => { CONFIG.SHOP_NAME_NP   = val; },
+    // ── Logo & footer text keys ─────────────────────────────────────────
+    logo_url:        () => { CONFIG.LOGO_URL        = val; },
+    logo:            () => { CONFIG.LOGO_URL        = val; },
+    footer_note:     () => { CONFIG.FOOTER_NOTE_EN  = val; },
+    footer_note_en:  () => { CONFIG.FOOTER_NOTE_EN  = val; },
+    footer_note_np:  () => { CONFIG.FOOTER_NOTE_NP  = val; },
+    // ── Page text keys ───────────────────────────────────────────────────
+    tagline:         () => { CONFIG.TAGLINE_EN     = val; },
+    tagline_en:      () => { CONFIG.TAGLINE_EN     = val; },
+    tagline_np:      () => { CONFIG.TAGLINE_NP     = val; },
+    chips:           () => { CONFIG.CHIPS_EN       = val.split(",").map(s => s.trim()).filter(Boolean); },
+    chips_en:        () => { CONFIG.CHIPS_EN       = val.split(",").map(s => s.trim()).filter(Boolean); },
+    chips_np:        () => { CONFIG.CHIPS_NP       = val.split(",").map(s => s.trim()).filter(Boolean); },
+    value1:          () => { CONFIG.VALUE1_EN      = val; },
+    value1_en:       () => { CONFIG.VALUE1_EN      = val; },
+    value1_np:       () => { CONFIG.VALUE1_NP      = val; },
+    value2:          () => { CONFIG.VALUE2_EN      = val; },
+    value2_en:       () => { CONFIG.VALUE2_EN      = val; },
+    value2_np:       () => { CONFIG.VALUE2_NP      = val; },
+    value3:          () => { CONFIG.VALUE3_EN      = val; },
+    value3_en:       () => { CONFIG.VALUE3_EN      = val; },
+    value3_np:       () => { CONFIG.VALUE3_NP      = val; },
   };
   if (SETTING_KEYS[key]) { SETTING_KEYS[key](); return true; }
   return false;
+}
+
+/**
+ * Parses a tagline string that may contain a [highlighted] word and returns
+ * safe HTML with the word wrapped in <mark class="hl">.
+ * Example input:  "Every piece leaves its own [footprint] — ..."
+ * Example output: 'Every piece leaves its own <mark class="hl">footprint</mark> — ...'
+ */
+function parseTaglineHTML(text) {
+  // Escape HTML first, then restore the bracket-wrapped word as a <mark>.
+  const escaped = text
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return escaped.replace(/\[([^\]]+)\]/g, '<mark class="hl">$1</mark>');
+}
+
+/**
+ * Applies any page-text settings loaded from the sheet to the live DOM.
+ * Only overwrites elements whose config values are non-empty, so the
+ * HTML defaults stay visible when the sheet hasn't set those keys yet.
+ */
+function updatePageTexts() {
+  // ── Logo ──────────────────────────────────────────────────────────────
+  const brandMark = document.getElementById("brand-mark");
+  if (brandMark && CONFIG.LOGO_URL) {
+    // Replace the default wave SVG with the custom logo image
+    brandMark.innerHTML =
+      `<img src="${CONFIG.LOGO_URL}" alt="${CONFIG.SHOP_NAME} logo" class="brand-logo-img" onerror="this.style.display='none'">`;
+  }
+
+  // ── Tagline ─────────────────────────────────────────────────────────────
+  const taglineEn = document.getElementById("tagline-en");
+  if (taglineEn && CONFIG.TAGLINE_EN) {
+    taglineEn.innerHTML = parseTaglineHTML(CONFIG.TAGLINE_EN);
+  }
+  const taglineNp = document.getElementById("tagline-np");
+  if (taglineNp && CONFIG.TAGLINE_NP) {
+    taglineNp.innerHTML = parseTaglineHTML(CONFIG.TAGLINE_NP);
+  }
+
+  // ── Occasion chips ──────────────────────────────────────────────────────
+  const chipRow = document.getElementById("chip-row");
+  if (chipRow && CONFIG.CHIPS_EN.length) {
+    chipRow.innerHTML = CONFIG.CHIPS_EN.map((chip, i) => {
+      const np = CONFIG.CHIPS_NP[i] || chip;
+      return `<span class="chip"><span class="en">${chip}</span><span class="np">${np}</span></span>`;
+    }).join("");
+  }
+
+  // ── Value props ─────────────────────────────────────────────────────────
+  function setValText(id, enText, npText) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (enText) el.querySelector(".en").textContent = enText;
+    if (npText) el.querySelector(".np").textContent = npText;
+  }
+  setValText("val1-text", CONFIG.VALUE1_EN, CONFIG.VALUE1_NP);
+  setValText("val2-text", CONFIG.VALUE2_EN, CONFIG.VALUE2_NP);
+  setValText("val3-text", CONFIG.VALUE3_EN, CONFIG.VALUE3_NP);
+
+  // ── Footer note ────────────────────────────────────────────────────────
+  const footerNoteEn = document.getElementById("footer-note-en");
+  if (footerNoteEn && CONFIG.FOOTER_NOTE_EN) footerNoteEn.textContent = CONFIG.FOOTER_NOTE_EN;
+  const footerNoteNp = document.getElementById("footer-note-np");
+  if (footerNoteNp && CONFIG.FOOTER_NOTE_NP) footerNoteNp.textContent = CONFIG.FOOTER_NOTE_NP;
 }
 
 

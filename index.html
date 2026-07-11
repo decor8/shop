@@ -20,20 +20,14 @@
   <header class="topbar">
     <div class="wrap topbar-inner">
       <div class="brand">
-        <span class="brand-mark" aria-hidden="true">
+        <span class="brand-mark" id="brand-mark" aria-hidden="true">
           <svg viewBox="0 0 40 24" class="wire-line">
             <path d="M2 12 C 8 4, 14 20, 20 12 S 32 4, 38 12" />
           </svg>
         </span>
         <span class="brand-name"><span class="en">Ful ko Paila</span><span class="np">फुलको पाइला</span></span>
       </div>
-      <div class="top-actions">
-        <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch language">ने</button>
-        <a class="wa-fab" id="topbar-whatsapp" href="#" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3Z"/><path d="M8.5 8.8c.2-.5.5-.5.8-.5h.6c.2 0 .4 0 .6.4.2.5.7 1.6.7 1.8.1.1.1.3 0 .4-.1.2-.2.3-.3.4-.1.2-.3.3-.4.5-.1.1-.3.3-.1.6.2.4.8 1.3 1.7 2.1 1.1 1 2.1 1.3 2.4 1.5.3.1.5.1.7-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1l1.6.8c.2.1.4.2.4.3.1.2.1 1-.2 1.6-.4.6-1.5 1.2-2.5 1.2-.9 0-2.4-.3-4.4-2.1-2.4-2.2-3.6-4.3-3.8-4.7-.2-.3-1.1-1.6-1.1-3 0-1.4.8-2 1.1-2.3Z" fill="currentColor" stroke="none"/></svg>
-          <span class="en">WhatsApp</span><span class="np">WhatsApp</span>
-        </a>
-      </div>
+
     </div>
 
     <div class="contact-ribbon">
@@ -49,6 +43,34 @@
         <a href="#" id="top-tiktok" target="_blank" rel="noopener" aria-label="TikTok" class="ribbon-link social-link" style="display: none;">
           <svg viewBox="0 0 24 24" class="icon"><path d="M12.525.02c1.31 0 2.57.39 3.64 1.11.08-.25.23-.48.45-.64.44-.33 1.01-.41 1.52-.22.44.17.79.52.96.96.19.51.11 1.08-.22 1.52-.16.22-.39.37-.64.45 1.34.8 2.37 2.1 2.87 3.63.1.31.05.65-.13.92-.25.37-.7.56-1.13.48-.38-.07-.7-.31-.87-.66-.46-1-.18-2.22.68-2.92.08-.07.16-.13.25-.19.04-.03.07-.06.1-.1v-.04c-.45-.18-.94-.28-1.46-.28-.31 0-.62.03-.92.09-.76.15-1.46.52-2.02 1.06-.52.5-1.35.5-1.87 0a1.32 1.32 0 0 1-.39-.93V9.75c0 2.21-1.79 4-4 4s-4-1.79-4-4 1.79-4 4-4c.31 0 .61.04.91.1.43.08.79.37.93.79.17.51-.09 1.07-.6 1.25-.08.03-.17.04-.25.04-.16 0-.32-.05-.46-.14-.15-.09-.34-.14-.53-.14-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2V1.34c0-.41.25-.78.63-.93C11.6.14 12.06.02 12.525.02z" fill="currentColor"/></svg>
           <span class="link-text"><span class="en">TikTok</span><span class="np">टिकटक</span></span>
+        </a>
+        <a href="#" id="top-x" target="_blank" rel="noopener" aria-label="X (Twitter)" class="ribbon-link social-link" style="display: none;">
+          <svg viewBox="0 0 24 24" class="icon"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.265 5.636 5.899-5.636Zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor"/></svg>
+          <span class="link-text"><span class="en">X</span><span class="np">X</span></span>
+        </a>
+        <a href="#" id="top-youtube" target="_blank" rel="noopener" aria-label="YouTube" class="ribbon-link social-link" style="display: none;">
+          <svg viewBox="0 0 24 24" class="icon"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="currentColor"/></svg>
+          <span class="link-text"><span class="en">YouTube</span><span class="np">युट्युब</span></span>
+        </a>
+        <a href="#" id="top-threads" target="_blank" rel="noopener" aria-label="Threads" class="ribbon-link social-link" style="display: none;">
+          <svg viewBox="0 0 24 24" class="icon"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.5 12.018c0-3.514.865-6.353 2.571-8.439C5.95 1.343 8.686.093 12.093 0h.214c2.7.05 5.013.982 6.875 2.772 1.892 1.818 2.894 4.218 2.985 7.137l.001.087c.004.21.007.424.007.636 0 3.032-1.091 5.523-3.161 7.21-1.666 1.362-3.887 2.089-6.419 2.126l-.409.032zm.09-21.544h-.149c-2.72.052-4.834.979-6.283 2.752C4.434 6.924 3.695 9.347 3.695 12.017c0 3.025.714 5.447 2.124 7.2 1.384 1.72 3.491 2.614 6.257 2.633 2.016-.031 3.717-.578 5.032-1.63 1.648-1.348 2.484-3.265 2.484-5.698 0-.182-.002-.363-.006-.539l-.001-.08c-.073-2.36-.843-4.27-2.288-5.682-1.413-1.38-3.271-2.09-5.521-2.137l-.5-.028zm-3.232 8.18c.007-2.38 1.745-4.033 4.28-4.033 2.093 0 3.504 1.27 3.504 3.154 0 1.773-1.103 2.863-3.012 2.999-.208.014-.416.021-.626.021-1.037 0-1.863-.195-2.453-.577-.634-.407-.962-1.025-.977-1.836l-.001-.086-.001-.08.286.438zm4.24-2.587c-1.45 0-2.367.848-2.373 2.149v.036c.008.393.132.677.377.843.33.213.838.316 1.513.316.155 0 .311-.006.464-.018 1.287-.09 1.867-.648 1.867-1.805 0-1.002-.661-1.521-1.848-1.521z" fill="currentColor"/></svg>
+          <span class="link-text"><span class="en">Threads</span><span class="np">थ्रेड्स</span></span>
+        </a>
+        <a href="#" id="top-snapchat" target="_blank" rel="noopener" aria-label="Snapchat" class="ribbon-link social-link" style="display: none;">
+          <svg viewBox="0 0 24 24" class="icon"><path d="M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.317 4.484l-.01.142c-.01.107.1.19.2.17.386-.08.talk-length-.307.95-.683.24-.184.495-.246.74-.2.75.157.809.744.809.744s.312.968-.234 1.77c-.028.04-.956 1.204-2.403 1.25-.22.007-.476.073-.608.38l-1.378 3.268a4.453 4.453 0 0 1-.87 1.408C14.017 18.6 13.1 19 12.014 19c-.96 0-1.73-.226-2.3-.607a4.23 4.23 0 0 1-.998-1.135l-1.378-3.268c-.132-.307-.388-.373-.608-.38-1.447-.046-2.375-1.21-2.403-1.25-.546-.802-.234-1.77-.234-1.77s.059-.587.809-.744c.245-.046.5.016.74.2.375.287.63.37.95.683.1.02.21-.063.2-.17l-.01-.142C6.691 9.83 6.565 7.804 7.094 6.61 8.678 3.07 12.035.793 12.206.793z" fill="currentColor"/></svg>
+          <span class="link-text"><span class="en">Snapchat</span><span class="np">स्न्यापच्याट</span></span>
+        </a>
+        <a href="#" id="top-pinterest" target="_blank" rel="noopener" aria-label="Pinterest" class="ribbon-link social-link" style="display: none;">
+          <svg viewBox="0 0 24 24" class="icon"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z" fill="currentColor"/></svg>
+          <span class="link-text"><span class="en">Pinterest</span><span class="np">पिन्टरेस्ट</span></span>
+        </a>
+        <a href="#" id="top-linkedin" target="_blank" rel="noopener" aria-label="LinkedIn" class="ribbon-link social-link" style="display: none;">
+          <svg viewBox="0 0 24 24" class="icon"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" fill="currentColor"/></svg>
+          <span class="link-text"><span class="en">LinkedIn</span><span class="np">लिङ्क्डइन</span></span>
+        </a>
+        <a href="#" id="top-telegram" target="_blank" rel="noopener" aria-label="Telegram" class="ribbon-link text-link" style="display: none;">
+          <svg viewBox="0 0 24 24" class="icon"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" fill="currentColor"/></svg>
+          <span class="link-text"><span class="en">Telegram</span><span class="np">टेलिग्राम</span></span>
         </a>
         <span class="sep" id="top-social-sep" style="display: none;" aria-hidden="true"></span>
         <a href="#" id="top-map" target="_blank" rel="noopener" class="ribbon-link text-link" style="display: none;">
@@ -81,11 +103,11 @@
     <div class="wrap hero-inner">
       <div class="hero-text">
         <p class="tagline">
-          <span class="en">Every piece leaves its own <mark class="hl">footprint</mark> — wire blooms &amp; scented candles, shaped by hand.</span>
-          <span class="np">हरेक सामानले आफ्नै <mark class="hl">पाइला</mark> छोड्छ — हातले बनाइएका तार-फूल र सुगन्धित मैनबत्ती।</span>
+          <span class="en" id="tagline-en">Every piece leaves its own <mark class="hl">footprint</mark> — wire blooms &amp; scented candles, shaped by hand.</span>
+          <span class="np" id="tagline-np">हरेक सामानले आफ्नै <mark class="hl">पाइला</mark> छोड्छ — हातले बनाइएका तार-फूल र सुगन्धित मैनबत्ती।</span>
         </p>
 
-        <div class="chip-row">
+        <div class="chip-row" id="chip-row">
           <span class="chip"><span class="en">Birthdays</span><span class="np">जन्मदिन</span></span>
           <span class="chip"><span class="en">Anniversaries</span><span class="np">वार्षिकोत्सव</span></span>
           <span class="chip"><span class="en">Housewarming</span><span class="np">गृहप्रवेश</span></span>
@@ -127,15 +149,15 @@
     <div class="wrap value-props-inner">
       <div class="value-item">
         <svg class="value-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 14c2-5 4 5 6 0s4 5 6 0 4 5 6 0"/></svg>
-        <span><span class="en">Shaped by hand, one wire at a time</span><span class="np">एक-एक तारबाट, हातले आकार दिइएको</span></span>
+        <span id="val1-text"><span class="en">Shaped by hand, one wire at a time</span><span class="np">एक-एक तारबाट, हातले आकार दिइएको</span></span>
       </div>
       <div class="value-item">
         <svg class="value-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 10h6v11a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V10Z"/><path d="M11 10c0-3 1-4 1-6 0 2 1 3 1 6"/></svg>
-        <span><span class="en">Poured and shaped in small batches</span><span class="np">थोरै-थोरै मात्रामा बनाइएको</span></span>
+        <span id="val2-text"><span class="en">Poured and shaped in small batches</span><span class="np">थोरै-थोरै मात्रामा बनाइएको</span></span>
       </div>
       <div class="value-item">
         <svg class="value-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="9" width="16" height="11" rx="1"/><path d="M4 13h16"/><path d="M12 9v11"/><path d="M8 9c0-2.2 1.3-4 4-4s4 1.8 4 4"/></svg>
-        <span><span class="en">Wrapped with care before it ships</span><span class="np">पठाउनुअघि मायाका साथ बेरिएको</span></span>
+        <span id="val3-text"><span class="en">Wrapped with care before it ships</span><span class="np">पठाउनुअघि मायाका साथ बेरिएको</span></span>
       </div>
     </div>
   </section>
@@ -217,8 +239,8 @@
   <footer class="site-footer">
     <div class="wrap footer-inner">
       <p>
-        <span class="en">Made by hand in small batches — no two pieces are quite the same.</span>
-        <span class="np">थोरै मात्रामा हातले बनाइएको — एउटै जस्तो अर्को हुँदैन।</span>
+        <span class="en" id="footer-note-en">Made by hand in small batches — no two pieces are quite the same.</span>
+        <span class="np" id="footer-note-np">थोरै मात्रामा हातले बनाइएको — एउटै जस्तो अर्को हुँदैन।</span>
       </p>
       <div class="footer-links">
         <a id="footer-whatsapp" href="#" target="_blank" rel="noopener">WhatsApp</a>
