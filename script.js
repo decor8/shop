@@ -14,21 +14,27 @@ const CONFIG = {
 
   // WhatsApp number in international format, digits only, no + or spaces.
   // Example: Nepal number 98XXXXXXXX with country code 977 -> "97798XXXXXXXX"
-  WHATSAPP_NUMBER: "9779860588764",
+  // Leave blank — value is loaded from the Google Sheet Settings tab.
+  WHATSAPP_NUMBER: "",
 
-  // Viber number in international format, digits only, no + or spaces. If empty, falls back to WhatsApp number.
+  // Viber number in international format, digits only, no + or spaces.
+  // Leave blank — value is loaded from the Google Sheet Settings tab.
   VIBER_NUMBER: "",
 
-  // Phone number for direct calling (voice calls). If empty, falls back to WhatsApp number.
+  // Phone number for direct calling (voice calls).
+  // Leave blank — value is loaded from the Google Sheet Settings tab.
   PHONE_NUMBER: "",
 
   // Instagram handle, without the @
-  INSTAGRAM_HANDLE: "FulKoPaila",
+  // Leave blank — value is loaded from the Google Sheet Settings tab.
+  INSTAGRAM_HANDLE: "",
 
   // Facebook profile/page URL (optional)
+  // Leave blank — value is loaded from the Google Sheet Settings tab.
   FACEBOOK_URL: "",
 
   // TikTok profile URL (optional)
+  // Leave blank — value is loaded from the Google Sheet Settings tab.
   TIKTOK_URL: "",
 
   // Google Map URL (optional)
