@@ -711,68 +711,106 @@ function saveContact() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 
-  showToast(currentLang() === "np" ? "सम्पर्क कार्ड डाउनलोड भयो।" : "Contact card downloaded.");
+  showToast(currentLang() === "np" ? "सम्पर्क कार्ड डाउनलोड भयो。" : "Contact card downloaded.");
 }
 
 async function loadSettings() {
   const url = getSettingsCSVUrl(CONFIG.SHEET_CSV_URL);
-  if (!url) return;
 
-  try {
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) return;
-    const text = await res.text();
-    const rows = parseCSV(text);
-    if (rows.length < 2) return;
+  let loadedAny = false;
 
-    const headers = rows[0].map(h => h.trim().toLowerCase());
-    const iKey = headers.indexOf("key");
-    const iVal = headers.indexOf("value");
+  // ── Try the dedicated Settings tab first ───────────────────────────────
+  if (url) {
+    try {
+      const res = await fetch(url, { cache: "no-store" });
+      if (res.ok) {
+        const text = await res.text();
+        const rows = parseCSV(text);
 
-    if (iKey === -1 || iVal === -1) {
-      console.log("Settings sheet missing 'Key' or 'Value' columns.");
-      return;
-    }
+        const headers = rows[0] ? rows[0].map(h => h.trim().toLowerCase()) : [];
+        let iKey = headers.indexOf("key");
+        let iVal = headers.indexOf("value");
+        let startRow = 1;
 
-    rows.slice(1).forEach(row => {
-      const key = (row[iKey] || "").trim().toLowerCase();
-      const val = (row[iVal] || "").trim();
-      if (!key || !val) return;
+        // If there's no "Key"/"Value" header, treat col-A as key and col-B as value
+        if (iKey === -1 || iVal === -1) {
+          iKey = 0; iVal = 1; startRow = 0;
+        }
 
-      if (key === "whatsapp_number" || key === "whatsapp") {
-        CONFIG.WHATSAPP_NUMBER = val.replace(/[^\d+]/g, "");
-      } else if (key === "viber_number" || key === "viber") {
-        CONFIG.VIBER_NUMBER = val.replace(/[^\d+]/g, "");
-      } else if (key === "phone_number" || key === "phone" || key === "dial") {
-        CONFIG.PHONE_NUMBER = val.replace(/[^\d+]/g, "");
-      } else if (key === "instagram_handle" || key === "instagram") {
-        CONFIG.INSTAGRAM_HANDLE = val.replace(/https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/$/, "");
-      } else if (key === "facebook_url" || key === "facebook") {
-        CONFIG.FACEBOOK_URL = val;
-      } else if (key === "tiktok_url" || key === "tiktok") {
-        CONFIG.TIKTOK_URL = val;
-      } else if (key === "google_map_url" || key === "google_map" || key === "map") {
-        CONFIG.GOOGLE_MAP_URL = val;
-      } else if (key === "shop_address" || key === "address") {
-        CONFIG.SHOP_ADDRESS = val;
-      } else if (key === "shop_address_np" || key === "address_np") {
-        CONFIG.SHOP_ADDRESS_NP = val;
-      } else if (key === "shop_name") {
-        CONFIG.SHOP_NAME = val;
-      } else if (key === "shop_name_np") {
-        CONFIG.SHOP_NAME_NP = val;
+        rows.slice(startRow).forEach(row => {
+          const key = (row[iKey] || "").trim().toLowerCase();
+          const val = (row[iVal] || "").trim();
+          if (key === "key" || key === "keys" || key === "setting") return;
+          if (applySettingRow(key, val)) loadedAny = true;
+        });
       }
-    });
-
-    // Re-wire and update the interface
-    wireFooterLinks();
-    updateTopbarBrand();
-    updateUtilityBar();
-    updateCustomizerSummary();
-  } catch (err) {
-    console.error("Failed to load settings:", err);
+    } catch (err) {
+      console.warn("Settings tab fetch failed:", err);
+    }
   }
+
+  // ── Fallback: scan the main products sheet for setting rows ────────────
+  if (!loadedAny) {
+    try {
+      const csvUrl = getCSVUrl(CONFIG.SHEET_CSV_URL);
+      if (csvUrl) {
+        const res = await fetch(csvUrl, { cache: "no-store" });
+        if (res.ok) {
+          const text = await res.text();
+          const rows = parseCSV(text);
+          rows.forEach(row => {
+            const key = (row[0] || "").trim().toLowerCase();
+            const val = (row[1] || "").trim();
+            applySettingRow(key, val);
+          });
+        }
+      }
+    } catch (err) {
+      console.warn("Settings from product sheet failed:", err);
+    }
+  }
+
+  // ── Re-wire UI ─────────────────────────────────────────────────────────
+  wireFooterLinks();
+  updateTopbarBrand();
+  updateUtilityBar();
+  updateCustomizerSummary();
 }
+
+/**
+ * Applies one setting key→value pair to CONFIG.
+ * Returns true if the key was a recognised setting key.
+ */
+function applySettingRow(key, val) {
+  if (!key || !val) return false;
+  const SETTING_KEYS = {
+    whatsapp_number: () => { CONFIG.WHATSAPP_NUMBER = val.replace(/[^\d+]/g, ""); },
+    whatsapp:        () => { CONFIG.WHATSAPP_NUMBER = val.replace(/[^\d+]/g, ""); },
+    viber_number:    () => { CONFIG.VIBER_NUMBER    = val.replace(/[^\d+]/g, ""); },
+    viber:           () => { CONFIG.VIBER_NUMBER    = val.replace(/[^\d+]/g, ""); },
+    phone_number:    () => { CONFIG.PHONE_NUMBER    = val.replace(/[^\d+]/g, ""); },
+    phone:           () => { CONFIG.PHONE_NUMBER    = val.replace(/[^\d+]/g, ""); },
+    dial:            () => { CONFIG.PHONE_NUMBER    = val.replace(/[^\d+]/g, ""); },
+    instagram_handle:() => { CONFIG.INSTAGRAM_HANDLE = val.replace(/https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/$/, ""); },
+    instagram:       () => { CONFIG.INSTAGRAM_HANDLE = val.replace(/https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/$/, ""); },
+    facebook_url:    () => { CONFIG.FACEBOOK_URL   = val; },
+    facebook:        () => { CONFIG.FACEBOOK_URL   = val; },
+    tiktok_url:      () => { CONFIG.TIKTOK_URL     = val; },
+    tiktok:          () => { CONFIG.TIKTOK_URL     = val; },
+    google_map_url:  () => { CONFIG.GOOGLE_MAP_URL = val; },
+    google_map:      () => { CONFIG.GOOGLE_MAP_URL = val; },
+    map:             () => { CONFIG.GOOGLE_MAP_URL = val; },
+    shop_address:    () => { CONFIG.SHOP_ADDRESS   = val; },
+    address:         () => { CONFIG.SHOP_ADDRESS   = val; },
+    shop_address_np: () => { CONFIG.SHOP_ADDRESS_NP = val; },
+    address_np:      () => { CONFIG.SHOP_ADDRESS_NP = val; },
+    shop_name:       () => { CONFIG.SHOP_NAME      = val; },
+    shop_name_np:    () => { CONFIG.SHOP_NAME_NP   = val; },
+  };
+  if (SETTING_KEYS[key]) { SETTING_KEYS[key](); return true; }
+  return false;
+}
+
 
 /* ===========================================================
    Language toggle
