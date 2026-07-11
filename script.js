@@ -10,7 +10,7 @@ const CONFIG = {
   SHEET_CSV_URL: "https://docs.google.com/spreadsheets/d/1TKVFZXRoAT2CzLqTNZsIfo7W4pIc4y1hAWZWXWHxDLc/edit?gid=0#gid=0",
 
   // Optional: URL to settings sheet CSV. If left blank, it is auto-derived from the main sheet.
-  SETTINGS_CSV_URL: "",
+  SETTINGS_CSV_URL: "https://docs.google.com/spreadsheets/d/1TKVFZXRoAT2CzLqTNZsIfo7W4pIc4y1hAWZWXWHxDLc/export?format=csv&gid=2143367181",
 
   // WhatsApp number in international format, digits only, no + or spaces.
   // Example: Nepal number 98XXXXXXXX with country code 977 -> "97798XXXXXXXX"
