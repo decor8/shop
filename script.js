@@ -103,6 +103,12 @@ const CONFIG = {
   // 4=Forest Green, 5=Dusty Lavender, 6=Terracotta, 7=Monochrome,
   // 8=Ocean Teal, 9=Deep Plum.
   THEME: "",
+
+  // Fixed bottom-right banner image.
+  // banner_url  → image to show (any publicly accessible image URL)
+  // banner_link → optional URL to open when the banner is clicked
+  BANNER_URL: "",
+  BANNER_LINK: "",
 };
 
 /* ===========================================================
@@ -966,6 +972,9 @@ function applySettingRow(key, val) {
     footer_note_en:  () => { CONFIG.FOOTER_NOTE_EN  = val; },
     footer_note_np:  () => { CONFIG.FOOTER_NOTE_NP  = val; },
     theme:           () => { CONFIG.THEME            = val.trim(); },
+    banner_url:      () => { CONFIG.BANNER_URL       = val; },
+    banner:          () => { CONFIG.BANNER_URL       = val; },
+    banner_link:     () => { CONFIG.BANNER_LINK      = val; },
     // ── Page text keys ───────────────────────────────────────────────────
     tagline:         () => { CONFIG.TAGLINE_EN     = val; },
     tagline_en:      () => { CONFIG.TAGLINE_EN     = val; },
@@ -1056,6 +1065,41 @@ function updatePageTexts() {
   if (footerNoteEn && CONFIG.FOOTER_NOTE_EN) footerNoteEn.textContent = CONFIG.FOOTER_NOTE_EN;
   const footerNoteNp = document.getElementById("footer-note-np");
   if (footerNoteNp && CONFIG.FOOTER_NOTE_NP) footerNoteNp.textContent = CONFIG.FOOTER_NOTE_NP;
+
+  // ── Banner ───────────────────────────────────────────────────────────
+  const bannerEl  = document.getElementById("site-banner");
+  const bannerImg = document.getElementById("site-banner-img");
+  const bannerClose = document.getElementById("site-banner-close");
+  if (bannerEl && bannerImg && CONFIG.BANNER_URL) {
+    bannerImg.src = CONFIG.BANNER_URL;
+    bannerImg.onerror = () => { bannerEl.style.display = "none"; };
+    bannerEl.style.display = "";
+
+    // Make the banner clickable if a link is provided
+    bannerEl.style.cursor = CONFIG.BANNER_LINK ? "pointer" : "default";
+    if (!bannerEl.dataset.clickWired) {
+      bannerEl.addEventListener("click", (e) => {
+        if (e.target === bannerClose) return; // handled by close button
+        if (CONFIG.BANNER_LINK) window.open(CONFIG.BANNER_LINK, "_blank", "noopener");
+      });
+      bannerEl.dataset.clickWired = "true";
+    }
+
+    // Close / dismiss button
+    if (bannerClose && !bannerClose.dataset.wired) {
+      bannerClose.addEventListener("click", (e) => {
+        e.stopPropagation();
+        bannerEl.style.animation = "none";
+        bannerEl.style.opacity   = "0";
+        bannerEl.style.transform = "translateY(16px) scale(0.95)";
+        bannerEl.style.transition = "opacity 0.25s, transform 0.25s";
+        setTimeout(() => { bannerEl.style.display = "none"; }, 260);
+      });
+      bannerClose.dataset.wired = "true";
+    }
+  } else if (bannerEl) {
+    bannerEl.style.display = "none";
+  }
 }
 
 
