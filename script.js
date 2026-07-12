@@ -97,6 +97,12 @@ const CONFIG = {
   // Footer tagline text.
   FOOTER_NOTE_EN: "",
   FOOTER_NOTE_NP: "",
+
+  // Colour theme number 1–9 (set via the Settings sheet key "theme").
+  // 1=Warm Marigold (default), 2=Rose Gold, 3=Midnight Blue,
+  // 4=Forest Green, 5=Dusty Lavender, 6=Terracotta, 7=Monochrome,
+  // 8=Ocean Teal, 9=Deep Plum.
+  THEME: "",
 };
 
 /* ===========================================================
@@ -959,6 +965,7 @@ function applySettingRow(key, val) {
     footer_note:     () => { CONFIG.FOOTER_NOTE_EN  = val; },
     footer_note_en:  () => { CONFIG.FOOTER_NOTE_EN  = val; },
     footer_note_np:  () => { CONFIG.FOOTER_NOTE_NP  = val; },
+    theme:           () => { CONFIG.THEME            = val.trim(); },
     // ── Page text keys ───────────────────────────────────────────────────
     tagline:         () => { CONFIG.TAGLINE_EN     = val; },
     tagline_en:      () => { CONFIG.TAGLINE_EN     = val; },
@@ -999,6 +1006,13 @@ function parseTaglineHTML(text) {
  * HTML defaults stay visible when the sheet hasn't set those keys yet.
  */
 function updatePageTexts() {
+  // ── Theme ──────────────────────────────────────────────────────────────
+  if (CONFIG.THEME && /^[1-9]$/.test(CONFIG.THEME)) {
+    document.documentElement.setAttribute("data-theme", CONFIG.THEME);
+  } else {
+    document.documentElement.removeAttribute("data-theme");
+  }
+
   // ── Logo ──────────────────────────────────────────────────────────────
   const brandMark = document.getElementById("brand-mark");
   if (brandMark && CONFIG.LOGO_URL) {

@@ -32,6 +32,159 @@
   --shadow: 0 6px 18px rgba(43,36,29,0.10);
 }
 
+/* ═══════════════════════════════════════════════════════════
+   COLOUR THEMES  (set via  theme: 1-9  in the Settings sheet)
+   Each block overrides only the tokens that change; everything
+   else falls back to the :root defaults above.
+═══════════════════════════════════════════════════════════ */
+
+/* Theme 1 — Warm Marigold (default, no override needed)      */
+
+/* Theme 2 — Rose Gold                                         */
+[data-theme="2"] {
+  --paper:              #F9F0F0;
+  --paper-raised:       #FDF6F6;
+  --ink:                #2D1A1A;
+  --ink-soft:           #6B4444;
+  --marigold:           #C97B8E;
+  --marigold-deep:      #A55A6E;
+  --moss:               #8E5A5A;
+  --moss-deep:          #6B4040;
+  --thread:             #BF7A7A;
+  --thread-deep:        #A05060;
+  --thread-panel:       #4A2828;
+  --thread-panel-light: #5F3333;
+  --thread-panel-border:#8A5A5A;
+  --line:               rgba(45,26,26,0.14);
+}
+
+/* Theme 3 — Midnight Blue                                     */
+[data-theme="3"] {
+  --paper:              #EDF0F7;
+  --paper-raised:       #F4F6FB;
+  --ink:                #0F1B33;
+  --ink-soft:           #3A4F72;
+  --marigold:           #4A80C4;
+  --marigold-deep:      #2D5F9E;
+  --moss:               #3A5E8C;
+  --moss-deep:          #274570;
+  --thread:             #5B7FBF;
+  --thread-deep:        #3D5E9E;
+  --thread-panel:       #0F1B33;
+  --thread-panel-light: #1A2E50;
+  --thread-panel-border:#2D5080;
+  --line:               rgba(15,27,51,0.14);
+}
+
+/* Theme 4 — Forest Green                                      */
+[data-theme="4"] {
+  --paper:              #EDF2EC;
+  --paper-raised:       #F3F7F2;
+  --ink:                #0F2010;
+  --ink-soft:           #2E4A30;
+  --marigold:           #5C9E3A;
+  --marigold-deep:      #3E7A22;
+  --moss:               #2E6B28;
+  --moss-deep:          #1E4E1A;
+  --thread:             #7DBF50;
+  --thread-deep:        #5A9E35;
+  --thread-panel:       #0F2010;
+  --thread-panel-light: #1A3A1C;
+  --thread-panel-border:#3A6B30;
+  --line:               rgba(15,32,16,0.14);
+}
+
+/* Theme 5 — Dusty Lavender                                    */
+[data-theme="5"] {
+  --paper:              #F2EFF8;
+  --paper-raised:       #F7F5FB;
+  --ink:                #1E1533;
+  --ink-soft:           #4A3D6B;
+  --marigold:           #8A6FBF;
+  --marigold-deep:      #6A4FA0;
+  --moss:               #6B5B9E;
+  --moss-deep:          #4E3F80;
+  --thread:             #B09FD8;
+  --thread-deep:        #8A72BF;
+  --thread-panel:       #1E1533;
+  --thread-panel-light: #2E2250;
+  --thread-panel-border:#5A4A90;
+  --line:               rgba(30,21,51,0.14);
+}
+
+/* Theme 6 — Terracotta Desert                                 */
+[data-theme="6"] {
+  --paper:              #F5EDE4;
+  --paper-raised:       #FAF3EB;
+  --ink:                #2B1A0D;
+  --ink-soft:           #6B4030;
+  --marigold:           #C4703A;
+  --marigold-deep:      #A04D20;
+  --moss:               #8B5E3C;
+  --moss-deep:          #6B4020;
+  --thread:             #D4835A;
+  --thread-deep:        #B0603A;
+  --thread-panel:       #2B1A0D;
+  --thread-panel-light: #3D2310;
+  --thread-panel-border:#7A4020;
+  --line:               rgba(43,26,13,0.14);
+}
+
+/* Theme 7 — Monochrome Ink                                    */
+[data-theme="7"] {
+  --paper:              #F0F0EE;
+  --paper-raised:       #F8F8F7;
+  --ink:                #111111;
+  --ink-soft:           #555555;
+  --marigold:           #444444;
+  --marigold-deep:      #222222;
+  --moss:               #555555;
+  --moss-deep:          #333333;
+  --thread:             #777777;
+  --thread-deep:        #555555;
+  --thread-panel:       #111111;
+  --thread-panel-light: #222222;
+  --thread-panel-border:#444444;
+  --line:               rgba(17,17,17,0.14);
+}
+
+/* Theme 8 — Ocean Teal                                        */
+[data-theme="8"] {
+  --paper:              #EAF4F4;
+  --paper-raised:       #F1F9F9;
+  --ink:                #0A2A2A;
+  --ink-soft:           #2A5A5A;
+  --marigold:           #1A9B9B;
+  --marigold-deep:      #0E7070;
+  --moss:               #2A7B7B;
+  --moss-deep:          #1A5A5A;
+  --thread:             #3ABFBF;
+  --thread-deep:        #1A9090;
+  --thread-panel:       #0A2A2A;
+  --thread-panel-light: #153F3F;
+  --thread-panel-border:#1A6B6B;
+  --line:               rgba(10,42,42,0.14);
+}
+
+/* Theme 9 — Deep Plum                                         */
+[data-theme="9"] {
+  --paper:              #F0EAF5;
+  --paper-raised:       #F6F2FA;
+  --ink:                #1A0A2E;
+  --ink-soft:           #4A306B;
+  --marigold:           #9B4DBF;
+  --marigold-deep:      #7A2EA0;
+  --moss:               #6B2E8C;
+  --moss-deep:          #4E1E6B;
+  --thread:             #C07AD8;
+  --thread-deep:        #9B50BF;
+  --thread-panel:       #1A0A2E;
+  --thread-panel-light: #2A1545;
+  --thread-panel-border:#6A2E90;
+  --line:               rgba(26,10,46,0.14);
+}
+
+
 *{ box-sizing: border-box; }
 
 @media (prefers-reduced-motion: reduce){
