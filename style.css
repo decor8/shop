@@ -449,14 +449,27 @@ body.lang-np .tagline{ font-style: normal; }
   padding: 0 1px;
 }
 
-.hero-illustration{
+.hero-visual {
   flex: 0 0 auto;
+  position: relative;
   width: 190px;
+}
+.hero-illustration{
+  display: block;
+  width: 100%;
   height: auto;
   opacity: 0.95;
 }
+/* Custom banner image — same slot as the SVG illustration */
+.hero-banner-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+}
 @media (max-width: 760px){
-  .hero-illustration{ display: none; }
+  .hero-visual { display: none; }
 }
 
 /* Occasion chips — decorative, handwritten-tag feel */
@@ -1189,73 +1202,6 @@ body.lang-np .footer-inner{ font-family: var(--font-np); }
   }
   .customizer-actions .config-order-btn {
     flex: 1;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════
-   Site Banner  (fixed bottom-right, loaded from Settings sheet)
-═══════════════════════════════════════════════════════════ */
-@keyframes bannerSlideUp {
-  from { opacity: 0; transform: translateY(24px) scale(0.96); }
-  to   { opacity: 1; transform: translateY(0)    scale(1);    }
-}
-
-.site-banner {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 9000;
-  max-width: 280px;
-  width: calc(100vw - 48px);
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(43,36,29,0.22), 0 2px 8px rgba(43,36,29,0.12);
-  animation: bannerSlideUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
-  cursor: pointer;
-  border: 1.5px solid var(--line);
-  background: var(--paper-raised);
-}
-
-.site-banner-img {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  border-radius: 12px;
-}
-
-.site-banner-close {
-  position: absolute;
-  top: 7px;
-  right: 7px;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(43,36,29,0.55);
-  color: #fff;
-  font-size: 16px;
-  line-height: 1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.18s, background 0.18s;
-  padding: 0;
-}
-.site-banner:hover .site-banner-close {
-  opacity: 1;
-}
-.site-banner-close:hover {
-  background: rgba(43,36,29,0.85);
-}
-
-@media (max-width: 480px) {
-  .site-banner {
-    bottom: 16px;
-    right: 16px;
-    max-width: calc(100vw - 32px);
   }
 }
 

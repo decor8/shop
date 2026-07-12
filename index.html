@@ -116,29 +116,34 @@
         </a>
       </div>
 
-      <svg class="hero-illustration" viewBox="0 0 240 220" aria-hidden="true">
-        <path d="M65 210 C 60 165, 72 145, 68 92" stroke="var(--moss)" stroke-width="3" fill="none" stroke-linecap="round"/>
-        <path d="M118 210 C 115 155, 126 132, 122 74" stroke="var(--moss)" stroke-width="3" fill="none" stroke-linecap="round"/>
-        <g>
-          <circle cx="68" cy="82" r="10" fill="var(--marigold)"/>
-          <circle cx="53" cy="82" r="9" fill="var(--marigold)"/>
-          <circle cx="83" cy="82" r="9" fill="var(--marigold)"/>
-          <circle cx="68" cy="67" r="9" fill="var(--marigold)"/>
-          <circle cx="68" cy="97" r="9" fill="var(--marigold)"/>
-          <circle cx="68" cy="82" r="6" fill="var(--marigold-deep)"/>
-        </g>
-        <g>
-          <circle cx="122" cy="62" r="8" fill="var(--thread)"/>
-          <circle cx="110" cy="62" r="7" fill="var(--thread)"/>
-          <circle cx="134" cy="62" r="7" fill="var(--thread)"/>
-          <circle cx="122" cy="50" r="7" fill="var(--thread)"/>
-          <circle cx="122" cy="74" r="7" fill="var(--thread)"/>
-          <circle cx="122" cy="62" r="5" fill="var(--thread-deep)"/>
-        </g>
-        <rect x="168" y="122" width="34" height="58" rx="4" fill="var(--paper-raised)" stroke="var(--ink)" stroke-width="2"/>
-        <line x1="185" y1="122" x2="185" y2="110" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
-        <path d="M185 110 C 181 102, 189 98, 185 90 C 181 98, 189 102, 185 110 Z" fill="var(--marigold)"/>
-      </svg>
+      <!-- Hero visual: shows the SVG by default, or a custom banner image from the Settings sheet -->
+      <div class="hero-visual" id="hero-visual">
+        <svg id="hero-illustration-svg" class="hero-illustration" viewBox="0 0 240 220" aria-hidden="true">
+          <path d="M65 210 C 60 165, 72 145, 68 92" stroke="var(--moss)" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M118 210 C 115 155, 126 132, 122 74" stroke="var(--moss)" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <g>
+            <circle cx="68" cy="82" r="10" fill="var(--marigold)"/>
+            <circle cx="53" cy="82" r="9" fill="var(--marigold)"/>
+            <circle cx="83" cy="82" r="9" fill="var(--marigold)"/>
+            <circle cx="68" cy="67" r="9" fill="var(--marigold)"/>
+            <circle cx="68" cy="97" r="9" fill="var(--marigold)"/>
+            <circle cx="68" cy="82" r="6" fill="var(--marigold-deep)"/>
+          </g>
+          <g>
+            <circle cx="122" cy="62" r="8" fill="var(--thread)"/>
+            <circle cx="110" cy="62" r="7" fill="var(--thread)"/>
+            <circle cx="134" cy="62" r="7" fill="var(--thread)"/>
+            <circle cx="122" cy="50" r="7" fill="var(--thread)"/>
+            <circle cx="122" cy="74" r="7" fill="var(--thread)"/>
+            <circle cx="122" cy="62" r="5" fill="var(--thread-deep)"/>
+          </g>
+          <rect x="168" y="122" width="34" height="58" rx="4" fill="var(--paper-raised)" stroke="var(--ink)" stroke-width="2"/>
+          <line x1="185" y1="122" x2="185" y2="110" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+          <path d="M185 110 C 181 102, 189 98, 185 90 C 181 98, 189 102, 185 110 Z" fill="var(--marigold)"/>
+        </svg>
+        <!-- Banner image — replaces the SVG when banner_url is set in the Settings sheet -->
+        <img id="hero-banner-img" class="hero-banner-img" src="" alt="" style="display:none;" loading="lazy">
+      </div>
     </div>
   </section>
 
@@ -249,14 +254,7 @@
     </div>
   </footer>
 
-  <!-- Fixed bottom-right banner — shown only when banner_url is set in the Settings sheet -->
-  <div id="site-banner" class="site-banner" style="display:none;" role="complementary" aria-label="Banner">
-    <button class="site-banner-close" id="site-banner-close" aria-label="Close banner" title="Close">×</button>
-    <img id="site-banner-img" src="" alt="Banner" class="site-banner-img">
-  </div>
-
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
 
   <script src="script.js?v=1.1"></script>
 </body>
