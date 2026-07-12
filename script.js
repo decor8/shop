@@ -67,8 +67,8 @@ const CONFIG = {
 
   CURRENCY_PREFIX: "Rs. ",
 
-  SHOP_NAME: "Ful ko Paila",
-  SHOP_NAME_NP: "फुलको पाइला",
+  SHOP_NAME: "",
+  SHOP_NAME_NP: "",
 
   // Minimum quantity a customer can pick in the customizer
   MIN_CUSTOM_QTY: 1,
@@ -584,8 +584,9 @@ function getSettingsCSVUrl(url) {
 function updateTopbarBrand() {
   const brandNameEn = document.querySelector(".brand-name .en");
   const brandNameNp = document.querySelector(".brand-name .np");
-  if (brandNameEn) brandNameEn.textContent = CONFIG.SHOP_NAME;
-  if (brandNameNp) brandNameNp.textContent = CONFIG.SHOP_NAME_NP;
+  // Only overwrite when a real value has been loaded from the sheet
+  if (brandNameEn && CONFIG.SHOP_NAME)   brandNameEn.textContent = CONFIG.SHOP_NAME;
+  if (brandNameNp && CONFIG.SHOP_NAME_NP) brandNameNp.textContent = CONFIG.SHOP_NAME_NP;
 }
 
 function updateUtilityBar() {
