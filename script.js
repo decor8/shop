@@ -1419,9 +1419,32 @@ function getCSVUrl(url) {
 /* ===========================================================
    Boot
 =========================================================== */
+function wireRibbonToggle() {
+  const ribbon = document.getElementById("contact-ribbon");
+  const toggleBtn = document.getElementById("ribbon-toggle-btn");
+  if (!ribbon || !toggleBtn) return;
+
+  // Maximize every time the page is loaded
+  ribbon.classList.remove("is-collapsed");
+  toggleBtn.setAttribute("aria-label", "Minimize social and contact banner");
+  toggleBtn.setAttribute("title", "Minimize");
+
+  toggleBtn.addEventListener("click", () => {
+    const isCollapsed = ribbon.classList.toggle("is-collapsed");
+    if (isCollapsed) {
+      toggleBtn.setAttribute("aria-label", "Expand social and contact banner");
+      toggleBtn.setAttribute("title", "Expand");
+    } else {
+      toggleBtn.setAttribute("aria-label", "Minimize social and contact banner");
+      toggleBtn.setAttribute("title", "Minimize");
+    }
+  });
+}
+
 async function init() {
   wireFooterLinks();
   wireLangToggle();
+  wireRibbonToggle();
   updateUtilityBar();
 
   if (!CONFIG.SHEET_CSV_URL || CONFIG.SHEET_CSV_URL.includes("PASTE_YOUR")) {

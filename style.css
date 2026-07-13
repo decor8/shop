@@ -435,8 +435,55 @@ h1 .np, h2 .np, h3 .np, .brand-name .np{ font-family: var(--font-np-display); }
 .contact-ribbon {
   background: rgba(0, 0, 0, 0.18);
   border-top: 1.5px solid rgba(239, 230, 212, 0.08);
-  padding: 12px 0;
   width: 100%;
+  position: relative;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 120px; /* expanded: tall enough for any content */
+}
+.contact-ribbon-body {
+  padding: 12px 0 8px;
+}
+.contact-ribbon.is-collapsed {
+  max-height: 0 !important;
+  border-top-color: transparent !important;
+}
+
+/* Toggle button — sits at bottom of ribbon, centred */
+.ribbon-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--ink);
+  border: 1.5px solid rgba(239, 230, 212, 0.22);
+  color: #c9bfac;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, bottom 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+}
+.ribbon-toggle-btn:hover {
+  background: var(--marigold);
+  color: var(--ink);
+  border-color: var(--marigold);
+}
+.ribbon-toggle-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* Collapsed state: icon rotates 180° → points downward (expand) */
+.contact-ribbon.is-collapsed ~ .ribbon-toggle-btn .ribbon-toggle-icon {
+  transform: rotate(180deg);
 }
 .contact-ribbon-inner {
   display: flex;
