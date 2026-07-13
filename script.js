@@ -104,6 +104,13 @@ const CONFIG = {
   // 8=Ocean Teal, 9=Deep Plum.
   THEME: "",
 
+  // Text style number 1–9 (set via the Settings sheet key "text_style").
+  // Controls the font pairing / typography mood of the shop.
+  // 1=Classic Serif (default), 2=Modern Sans, 3=Handwritten Warm,
+  // 4=Mono Editorial, 5=Elegant Thin, 6=Bold Display, 7=Playful Round,
+  // 8=Minimal Clean, 9=Heritage Slab.
+  TEXT_STYLE: "",
+
   // Hero illustration banner image.
   // Set banner_url to any public image URL to replace the wire-flower SVG.
   BANNER_URL: "",
@@ -192,6 +199,7 @@ function rowsToProducts(rows) {
   const iPrice = idx("price");
   const iImage = idx("image url");
   const iStock = idx("in stock");
+  const iStockCount = idx("stock");  // numeric column — max purchasable quantity
   const iDesc = idx("description");
   const iRole = idx("customizer role");
 
@@ -203,6 +211,10 @@ function rowsToProducts(rows) {
     const imageRaw = (iImage > -1 ? r[iImage] : "").trim();
     // Supports one image, or several separated by commas and/or spaces.
     const images = imageRaw ? imageRaw.split(/[,\s]+/).map(s => s.trim()).filter(Boolean) : [];
+    // Numeric stock count: if the "stock" column is a positive integer, use it
+    // as the per-product max quantity; otherwise fall back to MAX_CUSTOM_QTY.
+    const stockCountRaw = iStockCount > -1 ? (r[iStockCount] || "").trim() : "";
+    const stockCount = /^[0-9]+$/.test(stockCountRaw) ? parseInt(stockCountRaw, 10) : null;
 
     return {
       id: `p${i}`,
@@ -212,6 +224,7 @@ function rowsToProducts(rows) {
       price: priceNum,
       images,
       inStock,
+      stockCount,  // null = unlimited (up to MAX_CUSTOM_QTY)
       description: (iDesc > -1 ? r[iDesc] : "").trim(),
       customizerRole: roleRaw, // "flower" | "addon" | "wrap" | ""
     };
@@ -456,11 +469,16 @@ function renderShelf() {
     `;
 
     const output = card.querySelector("output");
+    // Per-product max quantity: use the numeric "stock" column when available,
+    // otherwise fall back to the global MAX_CUSTOM_QTY config value.
+    const maxQty = (product.stockCount !== null && product.stockCount > 0)
+      ? product.stockCount
+      : CONFIG.MAX_CUSTOM_QTY;
     card.querySelector('[data-action="dec"]').addEventListener("click", () => {
       output.textContent = Math.max(1, parseInt(output.textContent, 10) - 1);
     });
     card.querySelector('[data-action="inc"]').addEventListener("click", () => {
-      output.textContent = Math.min(20, parseInt(output.textContent, 10) + 1);
+      output.textContent = Math.min(maxQty, parseInt(output.textContent, 10) + 1);
     });
 
     const waBtn = card.querySelector('[data-channel="whatsapp"]');
@@ -499,9 +517,27 @@ function renderShelf() {
       let idx = 0;
       let failCount = 0;
 
-      const showImage = (newIdx) => {
+      const showImage = (newIdx, direction) => {
+        if (product.images.length <= 1) return;
+        // Animate the slide
+        const enterFrom = direction === "next" ? "100%" : "-100%";
+        const exitTo   = direction === "next" ? "-100%" : "100%";
+        imgEl.style.transition = "none";
+        imgEl.style.transform  = `translateX(${enterFrom})`;
+        // Force reflow then slide in
+        imgEl.getBoundingClientRect();
+        imgEl.style.transition = "transform 0.28s ease";
+        imgEl.style.transform  = "translateX(0)";
         idx = newIdx;
         imgEl.src = product.images[idx];
+        dotEls.forEach((d, di) => d.classList.toggle("active", di === idx));
+      };
+
+      // Initialize: no animation for first image
+      const showImageInit = (newIdx) => {
+        idx = newIdx;
+        imgEl.src = product.images[idx];
+        imgEl.style.transform = "";
         dotEls.forEach((d, di) => d.classList.toggle("active", di === idx));
       };
 
@@ -515,16 +551,50 @@ function renderShelf() {
           imgEl.replaceWith(tmp.firstElementChild);
           return;
         }
-        showImage((idx + 1) % product.images.length);
+        showImage((idx + 1) % product.images.length, "next");
       });
 
       if (product.images.length > 1) {
         mediaEl.style.cursor = "pointer";
-        mediaEl.addEventListener("click", () => showImage((idx + 1) % product.images.length));
+
+        // --- Touch / swipe support ---
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let isSwiping = false;
+        mediaEl.addEventListener("touchstart", (e) => {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+          isSwiping = false;
+        }, { passive: true });
+        mediaEl.addEventListener("touchmove", (e) => {
+          const dx = e.touches[0].clientX - touchStartX;
+          const dy = e.touches[0].clientY - touchStartY;
+          // Mark as swipe if horizontal movement dominates
+          if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 8) {
+            isSwiping = true;
+            e.preventDefault(); // prevent page scroll during horizontal swipe
+          }
+        }, { passive: false });
+        mediaEl.addEventListener("touchend", (e) => {
+          const dx = e.changedTouches[0].clientX - touchStartX;
+          if (isSwiping && Math.abs(dx) > 40) {
+            if (dx < 0) {
+              // Swiped left → next image
+              showImage((idx + 1) % product.images.length, "next");
+            } else {
+              // Swiped right → previous image
+              showImage((idx - 1 + product.images.length) % product.images.length, "prev");
+            }
+          }
+          isSwiping = false;
+        }, { passive: true });
+
+        // Dot navigation
         dotEls.forEach((dot, di) => {
           dot.addEventListener("click", (e) => {
             e.stopPropagation();
-            showImage(di);
+            const dir = di > idx ? "next" : "prev";
+            showImage(di, dir);
           });
         });
 
@@ -534,13 +604,13 @@ function renderShelf() {
         if (prevBtn) {
           prevBtn.addEventListener("click", (e) => {
             e.stopPropagation();
-            showImage((idx - 1 + product.images.length) % product.images.length);
+            showImage((idx - 1 + product.images.length) % product.images.length, "prev");
           });
         }
         if (nextBtn) {
           nextBtn.addEventListener("click", (e) => {
             e.stopPropagation();
-            showImage((idx + 1) % product.images.length);
+            showImage((idx + 1) % product.images.length, "next");
           });
         }
       }
@@ -970,6 +1040,8 @@ function applySettingRow(key, val) {
     footer_note_en:  () => { CONFIG.FOOTER_NOTE_EN  = val; },
     footer_note_np:  () => { CONFIG.FOOTER_NOTE_NP  = val; },
     theme:           () => { CONFIG.THEME            = val.trim(); },
+    text_style:      () => { CONFIG.TEXT_STYLE        = val.trim(); },
+    typography:      () => { CONFIG.TEXT_STYLE        = val.trim(); },
     banner_url:      () => { CONFIG.BANNER_URL       = val; },
     banner:          () => { CONFIG.BANNER_URL       = val; },
     // ── Page text keys ───────────────────────────────────────────────────
@@ -1017,6 +1089,13 @@ function updatePageTexts() {
     document.documentElement.setAttribute("data-theme", CONFIG.THEME);
   } else {
     document.documentElement.removeAttribute("data-theme");
+  }
+
+  // ── Text Style (typography) ────────────────────────────────────────────
+  if (CONFIG.TEXT_STYLE && /^[1-9]$/.test(CONFIG.TEXT_STYLE)) {
+    document.documentElement.setAttribute("data-text-style", CONFIG.TEXT_STYLE);
+  } else {
+    document.documentElement.removeAttribute("data-text-style");
   }
 
   // ── Logo ──────────────────────────────────────────────────────────────
