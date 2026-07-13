@@ -446,7 +446,7 @@ function renderShelf() {
           </button>
           ${product.inStock ? `
           <button type="button" class="order-btn copy-msg" data-channel="copy-msg">
-            <span class="en">Copy Link</span><span class="np">लिंक कपी</span>
+            <span class="en">Copy Order Details</span><span class="np">अर्डर कपी गर्नुहोस्</span>
           </button>` : ""}
           <button type="button" class="order-btn share" data-channel="share" aria-label="Share this item">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M8 7l4-4 4 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
