@@ -94,6 +94,14 @@ const CONFIG = {
   // Use a square or landscape PNG/SVG, ideally under 200px tall.
   LOGO_URL: "",
 
+  // Page <title> shown in the browser tab / search results.
+  // Leave blank to keep the value already in index.html.
+  PAGE_TITLE: "",
+
+  // Meta description used by search engines and link previews.
+  // Leave blank to keep the value already in index.html.
+  META_DESCRIPTION: "",
+
   // Footer tagline text.
   FOOTER_NOTE_EN: "",
   FOOTER_NOTE_NP: "",
@@ -1033,17 +1041,21 @@ function applySettingRow(key, val) {
     address_np:      () => { CONFIG.SHOP_ADDRESS_NP = val; },
     shop_name:       () => { CONFIG.SHOP_NAME      = val; },
     shop_name_np:    () => { CONFIG.SHOP_NAME_NP   = val; },
-    // ── Logo & footer text keys ─────────────────────────────────────────
-    logo_url:        () => { CONFIG.LOGO_URL        = val; },
-    logo:            () => { CONFIG.LOGO_URL        = val; },
-    footer_note:     () => { CONFIG.FOOTER_NOTE_EN  = val; },
-    footer_note_en:  () => { CONFIG.FOOTER_NOTE_EN  = val; },
-    footer_note_np:  () => { CONFIG.FOOTER_NOTE_NP  = val; },
-    theme:           () => { CONFIG.THEME            = val.trim(); },
-    text_style:      () => { CONFIG.TEXT_STYLE        = val.trim(); },
-    typography:      () => { CONFIG.TEXT_STYLE        = val.trim(); },
-    banner_url:      () => { CONFIG.BANNER_URL       = val; },
-    banner:          () => { CONFIG.BANNER_URL       = val; },
+    // ── Logo, footer, SEO keys ───────────────────────────────────────────
+    logo_url:         () => { CONFIG.LOGO_URL         = val; },
+    logo:             () => { CONFIG.LOGO_URL         = val; },
+    footer_note:      () => { CONFIG.FOOTER_NOTE_EN   = val; },
+    footer_note_en:   () => { CONFIG.FOOTER_NOTE_EN   = val; },
+    footer_note_np:   () => { CONFIG.FOOTER_NOTE_NP   = val; },
+    page_title:       () => { CONFIG.PAGE_TITLE        = val; },
+    title:            () => { CONFIG.PAGE_TITLE        = val; },
+    meta_description: () => { CONFIG.META_DESCRIPTION = val; },
+    description:      () => { CONFIG.META_DESCRIPTION = val; },
+    theme:            () => { CONFIG.THEME             = val.trim(); },
+    text_style:       () => { CONFIG.TEXT_STYLE        = val.trim(); },
+    typography:       () => { CONFIG.TEXT_STYLE        = val.trim(); },
+    banner_url:       () => { CONFIG.BANNER_URL        = val; },
+    banner:           () => { CONFIG.BANNER_URL        = val; },
     // ── Page text keys ───────────────────────────────────────────────────
     tagline:         () => { CONFIG.TAGLINE_EN     = val; },
     tagline_en:      () => { CONFIG.TAGLINE_EN     = val; },
@@ -1096,6 +1108,20 @@ function updatePageTexts() {
     document.documentElement.setAttribute("data-text-style", CONFIG.TEXT_STYLE);
   } else {
     document.documentElement.removeAttribute("data-text-style");
+  }
+
+  // ── Page title & meta description ──────────────────────────────────────
+  if (CONFIG.PAGE_TITLE) {
+    document.title = CONFIG.PAGE_TITLE;
+  }
+  if (CONFIG.META_DESCRIPTION) {
+    let metaEl = document.querySelector('meta[name="description"]');
+    if (!metaEl) {
+      metaEl = document.createElement("meta");
+      metaEl.name = "description";
+      document.head.appendChild(metaEl);
+    }
+    metaEl.content = CONFIG.META_DESCRIPTION;
   }
 
   // ── Logo ──────────────────────────────────────────────────────────────
