@@ -437,16 +437,21 @@ h1 .np, h2 .np, h3 .np, .brand-name .np{ font-family: var(--font-np-display); }
   border-top: 1.5px solid rgba(239, 230, 212, 0.08);
   width: 100%;
   position: relative;
-  overflow: hidden;
-  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  max-height: 120px; /* expanded: tall enough for any content */
+  overflow: visible; /* Prevent clipping of absolute-positioned toggle button */
 }
 .contact-ribbon-body {
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), padding 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 250px; /* Safe expanded height to support wrapped links on mobile */
   padding: 12px 0 8px;
 }
 .contact-ribbon.is-collapsed {
-  max-height: 0 !important;
   border-top-color: transparent !important;
+}
+.contact-ribbon.is-collapsed .contact-ribbon-body {
+  max-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 /* Toggle button — sits at bottom of ribbon, centred */
@@ -482,7 +487,7 @@ h1 .np, h2 .np, h3 .np, .brand-name .np{ font-family: var(--font-np-display); }
   transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 /* Collapsed state: icon rotates 180° → points downward (expand) */
-.contact-ribbon.is-collapsed ~ .ribbon-toggle-btn .ribbon-toggle-icon {
+.contact-ribbon.is-collapsed .ribbon-toggle-icon {
   transform: rotate(180deg);
 }
 .contact-ribbon-inner {
